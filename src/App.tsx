@@ -1,6 +1,6 @@
 import React from 'react';
 import './App.css';
-import {VideoControl} from "./video/VideoControl";
+import { VideoControl } from './video/VideoControl';
 
 function App() {
   return (
@@ -11,4 +11,3 @@ function App() {
 }
 
 export default App;
-
