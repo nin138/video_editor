@@ -1,0 +1,30 @@
+.button {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  position: relative;
+  box-sizing: border-box;
+  background-color: transparent;
+  outline: 0;
+  margin: 0;
+  cursor: pointer;
+  user-select: none;
+  vertical-align: middle;
+  appearance: none;
+  text-decoration: none;
+  font-family: Roboto, Helvetica, Arial, sans-serif;
+  font-weight: 500;
+  font-size: 0.875rem;
+  line-height: 1.75;
+  padding: 11px;
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  color: #eee;
+}
+
+.toggleActive {
+  background: rgba(255, 255, 255, 0.3);
+}
+
+.ripple {
+  background: rgba(255, 255, 255, 0.1);
+}

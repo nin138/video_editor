@@ -1,0 +1,16 @@
+.videoControl {
+  margin: 20px auto;
+  width: 70%;
+}
+
+.video {
+  width: 100%;
+}
+
+.commandArea > :first-of-type > div {
+  border-radius: 4px 0 0 4px;
+}
+
+.commandArea > :last-of-type > div {
+  border-radius: 0 4px 4px 0;
+}

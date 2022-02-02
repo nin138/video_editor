@@ -1,0 +1,14 @@
+.eventArea {
+  width: 200px;
+  display: flex;
+  flex-direction: column;
+  background: rgba(255, 255, 255, 0.2);
+}
+
+.event {
+  display: flex;
+}
+
+.time {
+  margin-right: 20px;
+}

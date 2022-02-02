@@ -1,0 +1,26 @@
+.wrap {
+  position: absolute;
+  display: flex;
+  height: 120px;
+}
+
+.item {
+  box-sizing: border-box;
+  border: solid 1px #00f;
+  background-image: linear-gradient(to right, #e0e0e0 0%, #777 5%, #ffffff 50%);
+}
+
+.line {
+  height: 100px;
+  position: absolute;
+  width: 2px;
+  background: #777;
+  pointer-events: none;
+}
+
+.time {
+  position: absolute;
+  bottom: -20px;
+  left: -8px;
+  color: #aaa;
+}

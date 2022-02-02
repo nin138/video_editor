@@ -1,58 +1,70 @@
-import './VideoControl.css';
+import styles from './VideoControl.module.css';
 import React, {
   MutableRefObject,
   ReactEventHandler,
+  useContext,
   useEffect,
-  useLayoutEffect,
-  useRef,
   useState,
+  Suspense,
 } from 'react';
 import { getFFmpeg } from '../ffmpeg/ffmpeg';
-import { Range } from 'react-range';
-import { SliderThumb, SliderTrack } from './SliderItem';
-import { ToggleButton } from '../atoms/ToggleButton';
+import { ToggleButton } from '../atoms/Button/ToggleButton';
 import { Option } from '../atoms/Option';
+import { TimeSlider } from './TimeSlider/TimeSlider';
+import {
+  CutIcon,
+  LabelLeft,
+  LabelRight,
+  PlaySelectedRangeIcon,
+  RepeatIcon,
+} from '../atoms/Icons';
+import { IconButton } from '../atoms/Button/IconButton';
+import { PlayStopButton } from '../atoms/Button/PlayStopButton';
+import { RangeData } from '../rangeData';
+import { AppEventContext, AppEvents } from '../context/AppEvent';
+import { CircularProgress } from '@mui/material';
+import { SelectedVideoContext } from '../context/VideoUrl';
+import { ClipContext } from '../context/Clips';
+import { ClipVideo } from '../context/video';
+import { Video } from './Video';
 
-class RangeData {
-  private _data: [number, number];
-
-  public get data() {
-    return this._data;
+function* makeClipName() {
+  let i = 0;
+  while (true) {
+    i++;
+    const date = new Date();
+    yield 'clip' +
+      i +
+      '-' +
+      date.getFullYear() +
+      '-' +
+      (date.getMonth() + 1) +
+      '-' +
+      date.getDate() +
+      '__' +
+      date.toLocaleTimeString() +
+      '.mp4';
   }
-
-  constructor(data: [number, number]) {
-    this._data = data;
-  }
-
-  update(data: [number, number]) {
-    return new RangeData(data);
-    this._data = data;
-    return this;
-  }
-
-  start() {
-    return this.data.sort()[0];
-  }
-
-  end() {
-    return this.data.sort()[1];
-  }
-
-  duration() {
-    return this.end() - this.start();
-  }
+  return '';
 }
+
+const getClipName: Generator<string, string, string> = makeClipName();
 
 export const VideoControl = () => {
   const [videoDuration, setVideoDuration] = useState(0);
-  const [currentTime, setCurrentTime] = useState([0]);
+  const [currentTime, setCurrentTime] = useState(0);
+
+  const { dispatch } = useContext(AppEventContext);
+  const { selectedVideo } = useContext(SelectedVideoContext);
 
   const [selectedRange, setSelectedRange] = useState(new RangeData([0, 0]));
-
-  // const selectedRange: MutableRefObject<[number, number]> = useRef([0, 0]);
+  const [playing, setPlaying] = useState(false);
 
   const [repeat, setRepeat] = useState(false);
   const [playOnlySelectedRange, setPlayOnlySelectedRange] = useState(false);
+  const [clipping, setClipping] = useState(false);
+
+  const { addClip } = useContext(ClipContext);
 
   const videoRef: MutableRefObject<HTMLVideoElement | null> =
     React.useRef(null);
@@ -69,48 +81,48 @@ export const VideoControl = () => {
     }
   };
 
-  const onSliderChanged: (value: number) => void = (value) => {
-    if (!videoRef.current) return;
-    console.log(value);
-    videoRef.current.currentTime = value;
-  };
-
-  const onVideoSeeked = (values: number[]) => {
-    setCurrentTime(values);
-    if (videoRef.current) videoRef.current.currentTime = values[0];
+  const onVideoSeeked = (value: number) => {
+    setCurrentTime(value);
+    if (videoRef.current) videoRef.current.currentTime = value;
   };
 
   const onRangeChanged: (values: number[]) => void = (values) => {
     if (!videoRef.current) return;
 
-    console.log(values);
     setSelectedRange(selectedRange.update(values as [number, number]));
   };
 
   const videoRef2: MutableRefObject<HTMLVideoElement | null> =
     React.useRef(null);
   const onSliceButtonClicked = () => {
-    console.log('c');
-    getFFmpeg().then(async (it) => {
-      console.log(1);
-      const fileName = 'test.mp4';
-      const outFileName = '/out.mp4';
-      await it.writeFileFromURL('/test.mp4', fileName);
-      console.log(2);
-      await it.sliceVideo(
-        selectedRange.start(),
-        selectedRange.end(),
-        fileName,
-        outFileName
-      );
-      const data = await it.readFile(outFileName);
+    if (clipping) return;
+    setClipping(true);
+    getFFmpeg()
+      .then(async (it) => {
+        const fileName = 'test.mp4';
+        const outFileName = getClipName.next().value;
 
-      console.log(3);
+        const input = await selectedVideo!.getPath();
 
-      videoRef2.current!.src = URL.createObjectURL(new Blob([data.buffer]));
+        await it.clipVideo(
+          selectedRange.start(),
+          selectedRange.end(),
+          input,
+          outFileName
+        );
+        dispatch(AppEvents.ReadFile.message);
 
-      console.log(5);
-    });
+        const clip = new ClipVideo(outFileName);
+        addClip(clip);
+
+        videoRef2.current!.src = await clip.getUrl();
+        setClipping(false);
+      })
+      .catch((e) => {
+        console.error(e);
+        dispatch(AppEvents.Error.message);
+        setClipping(false);
+      });
   };
 
   const onEnded = () => {
@@ -121,6 +133,7 @@ export const VideoControl = () => {
   };
 
   const onPlay = () => {
+    setPlaying(true);
     if (
       playOnlySelectedRange &&
       videoRef.current &&
@@ -129,11 +142,14 @@ export const VideoControl = () => {
       videoRef.current.currentTime = selectedRange.start();
     }
   };
+  const onPause = () => {
+    setPlaying(false);
+  };
 
   useEffect(() => {
     const listener = () => {
       if (!videoRef.current || videoRef.current.readyState <= 2) return;
-      setCurrentTime([videoRef.current.currentTime]);
+      setCurrentTime(videoRef.current.currentTime);
       if (!playOnlySelectedRange) return;
       if (selectedRange.duration() === 0) return;
       if (videoRef.current.currentTime < selectedRange.start())
@@ -149,58 +165,72 @@ export const VideoControl = () => {
     return () => clearInterval(id);
   });
 
-  return (
-    <div className="videoControl">
-      <video
-        ref={videoRef}
-        onEnded={onEnded}
-        onLoadedData={onLoadedData}
-        onPlay={onPlay}
-        src={'/test.mp4'}
-        controls
-        className={'video'}
-      />
-      <Option display={videoDuration != 0}>
-        <Range
-          values={currentTime}
-          onChange={onVideoSeeked}
-          min={0}
-          max={videoDuration}
-          renderTrack={({ props, children }) => (
-            <SliderTrack props={props} children={children} />
-          )}
-          renderThumb={SliderThumb}
-        />
+  const videoUrl = selectedVideo?.getUrl() || '';
 
-        <Range
-          values={selectedRange.data}
-          onChange={onRangeChanged}
-          min={0}
-          max={videoDuration}
-          allowOverlap
-          renderTrack={({ props, children }) => (
-            <SliderTrack props={props} children={children} />
-          )}
-          renderThumb={SliderThumb}
+  return (
+    <div className={styles.videoControl}>
+      <Suspense fallback={'loading...'}>
+        {selectedVideo ? (
+          <Video
+            videoRef={videoRef}
+            onEnded={onEnded}
+            onLoadedData={onLoadedData}
+            onPlay={onPlay}
+            onPause={onPause}
+            video={selectedVideo}
+            className={styles.video}
+          />
+        ) : (
+          <video className={styles.video} controls />
+        )}
+      </Suspense>
+      <Option display={videoDuration !== 0 && !!videoRef.current}>
+        <TimeSlider
+          range={selectedRange}
+          duration={videoDuration}
+          videoRef={videoRef.current!}
+          onRangeChanged={onRangeChanged}
+          onVideoSeeked={onVideoSeeked}
         />
-        {/*<Range min={0} max={videoDuration} count={1} allowCross={true} step={0.1} onAfterChange={onRangeChanged} />*/}
       </Option>
-      <button onClick={onSliceButtonClicked}>slice</button>
-      <div>
+      <div className={styles.commandArea}>
         <ToggleButton onClick={setRepeat} isActive={repeat}>
-          repeat
+          <RepeatIcon />
         </ToggleButton>
         <ToggleButton
           onClick={setPlayOnlySelectedRange}
           isActive={playOnlySelectedRange}
         >
-          play selected range
+          <PlaySelectedRangeIcon />
         </ToggleButton>
+        <IconButton
+          onClick={() =>
+            onRangeChanged([
+              videoRef.current?.currentTime || 0,
+              selectedRange.data[1],
+            ])
+          }
+        >
+          <LabelLeft />
+        </IconButton>
+        <IconButton
+          onClick={() =>
+            onRangeChanged([
+              selectedRange.data[0],
+              videoRef.current?.currentTime || 0,
+            ])
+          }
+        >
+          <LabelRight />
+        </IconButton>
+        <PlayStopButton playing={playing} videoRef={videoRef.current!} />
+
+        <IconButton disabled={clipping} onClick={onSliceButtonClicked}>
+          {clipping ? <CircularProgress size={24} /> : <CutIcon />}
+        </IconButton>
       </div>
 
-      <video ref={videoRef2} className={'video'} controls>
-        {' '}
-      </video>
+      <video width={320} ref={videoRef2} className={styles.video} controls />
     </div>
   );
 };

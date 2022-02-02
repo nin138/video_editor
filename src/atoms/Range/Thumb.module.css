@@ -1,0 +1,20 @@
+.label {
+  display: block;
+  position: absolute;
+  bottom: -28px;
+  color: #fff;
+  font-weight: bold;
+  font-size: 14px;
+  padding: 4px;
+  border-radius: 4px;
+  background-color: #548bf4;
+  white-space: nowrap;
+}
+
+.thumb {
+  outline: none;
+}
+
+.thumbIcon {
+  color: #333;
+}

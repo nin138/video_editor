@@ -1,0 +1,14 @@
+.track {
+  height: 8px;
+  width: 100%;
+  display: flex;
+  align-items: center;
+}
+
+.trackBar {
+  height: 8px;
+  width: 100%;
+  border-radius: 4px;
+  align-self: center;
+  background: #f00;
+}

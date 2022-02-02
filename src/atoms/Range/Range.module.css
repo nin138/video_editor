@@ -1,0 +1,22 @@
+.wrap {
+  margin: 20px 0;
+}
+
+.thumb {
+  height: 40px;
+  width: 16px;
+  border-radius: 4px;
+  background-color: #fff;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  box-shadow: 0px 2px 6px #aaa;
+}
+
+.sliderThumb {
+  border-radius: 50%;
+  box-shadow: 1px 1px 6px #333;
+  height: 12px;
+  width: 12px;
+  background-color: #999;
+}
