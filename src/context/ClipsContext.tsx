@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { Video } from './video';
+import { Video } from '../entities/video';
 
 interface Context {
   clips: Video[];

@@ -1,0 +1,27 @@
+.wrap {
+  width: calc(100% - 40px);
+  margin: 20px;
+}
+
+.videoArea {
+  height: 30px;
+  position: relative;
+}
+
+.scroll {
+  background: rgba(255, 255, 255, 0.1);
+  display: flex;
+  overflow-x: scroll;
+}
+
+.scrollLeft {
+  width: 100px;
+  position: sticky;
+  left: 0;
+  z-index: 1;
+  background: #282c34;
+}
+
+.scrollInner {
+  width: fit-content;
+}

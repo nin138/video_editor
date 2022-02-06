@@ -9,6 +9,7 @@ import SettingsEthernetIcon from '@mui/icons-material/SettingsEthernet';
 import ContentCutIcon from '@mui/icons-material/ContentCut';
 import FolderOpenIcon from '@mui/icons-material/FolderOpen';
 import DIcon from '@mui/icons-material/Download';
+import AddBoxIcon from '@mui/icons-material/AddBox';
 
 interface Props {
   style?: React.CSSProperties;
@@ -44,3 +45,4 @@ export const PlaySelectedRangeIcon: React.FC = () => {
 export const CutIcon = ContentCutIcon;
 export const FolderIcon = FolderOpenIcon;
 export const DownloadIcon = DIcon;
+export const AddIcon = AddBoxIcon;

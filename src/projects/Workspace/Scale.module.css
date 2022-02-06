@@ -1,0 +1,39 @@
+.container {
+  display: flex;
+  width: fit-content;
+  font-size: 8px;
+  border-bottom: solid #eee;
+}
+
+.wrap {
+  height: 20px;
+  display: flex;
+  align-items: flex-end;
+  position: relative;
+}
+
+.bar {
+  border-left: solid #eee;
+  width: 25%;
+}
+
+.start {
+  height: 7px;
+}
+
+.half {
+  height: 5px;
+}
+
+.quarter {
+  height: 4px;
+}
+
+.time {
+  position: absolute;
+  line-height: 0;
+  bottom: 12px;
+  display: inline-block;
+  transform: translate(-50%);
+  color: #eee;
+}

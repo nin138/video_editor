@@ -1,0 +1,9 @@
+.popOver {
+  background: rgba(20, 20, 20, 0.8) !important;
+  color: #eee !important;
+  padding: 4px 12px;
+}
+
+.text {
+  margin: 0;
+}

@@ -1,12 +1,18 @@
-import { createFFmpeg, fetchFile } from '@ffmpeg/ffmpeg';
+import { createFFmpeg, fetchFile, LogCallback } from '@ffmpeg/ffmpeg';
+import { type } from '@testing-library/user-event/dist/type';
 
 export const FILE_DIR = '/files/';
 export const CLIP_DIR = '/clips/';
 
 class FFmpeg {
+  private defaultLogger: LogCallback = ({ type, message }) => {
+    console.log(`type: ${type}|m=${message}`);
+  };
+
   private ffmpeg = createFFmpeg({
-    log: true,
+    log: false,
     corePath: 'https://unpkg.com/@ffmpeg/core@0.10.0/dist/ffmpeg-core.js',
+    logger: this.defaultLogger,
   });
 
   init(): Promise<void> {
@@ -33,6 +39,30 @@ class FFmpeg {
     const r = this.ffmpeg.run('-i', fileName);
     console.log(r);
     await r;
+  }
+
+  async getDuration(fileName: string) {
+    return new Promise((resolve, reject) => {
+      const logger: LogCallback = ({ type, message }) => {
+        if (message.includes('Duration')) {
+          const regex = /Duration.*(\d{2})\:(\d{2})\:(\d{2})\.(\d{2})/gm;
+          const matches = regex.exec(String(message));
+          if (matches != null) {
+            const h = Number(matches[1]);
+            const m = Number(matches[2]);
+            const s = Number(matches[3]);
+            const ms = Number('0.' + matches[4]);
+            const duration = h * 3600 + m * 60 + s + ms;
+            this.ffmpeg.setLogger(this.defaultLogger);
+            resolve(duration);
+          }
+          this.ffmpeg.setLogger(this.defaultLogger);
+          reject(new Error('Duration Not Found'));
+        }
+      };
+      this.ffmpeg.setLogger(logger);
+      this.ffmpeg.run('-i', fileName);
+    });
   }
 
   async clipVideo(

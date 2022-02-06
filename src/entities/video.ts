@@ -1,20 +1,59 @@
 import { CLIP_DIR, getFFmpeg } from '../ffmpeg/ffmpeg';
 import { nanoid } from 'nanoid';
+import { getResource } from '../util';
+import { SelectedItemType } from './workspace';
 
 export interface Video {
+  type: typeof SelectedItemType.Video;
   getUrl(): Promise<string> | string;
   fileName(): string;
   getPath(): Promise<string> | string;
+  id: Readonly<string>;
+  getDuration(): Promise<number> | number;
 }
 
-export class LocalVideo implements Video {
+abstract class VideoBase implements Video {
+  readonly type = SelectedItemType.Video;
+  private duration?: number | Promise<number>;
+  readonly id = nanoid();
+
+  async getDuration() {
+    if (this.duration) return this.duration;
+    const path = await getResource(this.getPath());
+    const ffmpeg = await getFFmpeg();
+    await ffmpeg.getInfo(path);
+    return 0;
+  }
+
+  abstract fileName(): string;
+
+  abstract getPath(): Promise<string> | string;
+
+  abstract getUrl(): Promise<string> | string;
+}
+
+export class LocalVideo extends VideoBase {
   private url: Promise<string> | string | undefined = undefined;
   private path: Promise<string> | string | undefined = undefined;
-  private rand: string;
 
   constructor(readonly file: File) {
-    this.rand = nanoid();
+    super();
   }
+
+  fileName = () => {
+    return this.file.name;
+  };
+
+  getPath: () => Promise<string> | string = () => {
+    if (this.path) return this.path;
+    this.path = new Promise<string>(async (resolve) => {
+      const ffmpeg = await getFFmpeg();
+      const path = await ffmpeg.writeFile(this.file, this.id + '.mp4');
+      this.path = path;
+      resolve(path);
+    });
+    return this.path;
+  };
 
   getUrl: () => Promise<string> | string = () => {
     if (this.url) return this.url;
@@ -25,26 +64,14 @@ export class LocalVideo implements Video {
     });
     return this.url;
   };
-
-  fileName = () => {
-    return this.file.name;
-  };
-
-  getPath: () => Promise<string> | string = () => {
-    if (this.path) return this.path;
-    this.path = new Promise<string>(async (resolve) => {
-      const ffmpeg = await getFFmpeg();
-      const path = await ffmpeg.writeFile(this.file, this.rand + '.mp4');
-      this.path = path;
-      resolve(path);
-    });
-    return this.path;
-  };
 }
 
-export class ClipVideo implements Video {
+export class ClipVideo extends VideoBase {
   private url: Promise<string> | string | undefined = undefined;
-  constructor(private name: string) {}
+
+  constructor(private name: string) {
+    super();
+  }
 
   fileName(): string {
     return this.name;

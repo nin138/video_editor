@@ -29,16 +29,24 @@
   justify-content: center;
 }
 
+.headText {
+  flex: 1;
+}
+
 .folderIcon {
   color: #aaa;
 }
 
 .files {
-  height: calc(60vh - 40px);
+  height: calc(50vh - 40px);
 }
 
 .clips {
-  height: calc(40vh - 40px);
+  height: calc(30vh - 40px);
+}
+
+.workspace {
+  height: calc(20vh - 40px);
 }
 
 .scroll {
@@ -56,6 +64,15 @@
   border-radius: 4px;
 }
 
+.addWorkspaceIcon {
+  margin: 0 8px;
+}
+
+.addWorkspaceIcon div {
+  padding: 0;
+  border: 0;
+}
+
 .scroll::-webkit-scrollbar-thumb {
   background-color: #111;
   box-shadow: inset 0 0 6px rgba(0, 0, 0, 0.3);
@@ -69,15 +86,19 @@
 .file {
   border-bottom: solid rgba(255, 255, 255, 0.4);
   margin: 0 12px;
-  padding: 6px 0;
   cursor: pointer;
   display: flex;
   align-items: center;
 }
 
+.selected {
+  background: rgba(255, 200, 200, 0.3);
+}
+
 .fileName {
   flex: 1;
   text-align: center;
+  padding: 6px 0;
 }
 
 .fileName:hover {
@@ -89,6 +110,7 @@
   width: 20px;
   height: 20px;
   border-radius: 50%;
+  margin: 0 8px;
 }
 
 .dlIconButton div {
@@ -98,4 +120,21 @@
 
 .dlIcon {
   font-size: 16px;
+}
+
+.noItem {
+  height: inherit;
+  display: flex;
+}
+
+.noItemInner {
+  flex: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 18px;
+  border: dotted;
+  border-radius: 8px;
+  margin: 20px;
+  background: rgba(255, 255, 255, 0.2);
 }

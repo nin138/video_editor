@@ -23,10 +23,9 @@ import { PlayStopButton } from '../atoms/Button/PlayStopButton';
 import { RangeData } from '../rangeData';
 import { AppEventContext, AppEvents } from '../context/AppEvent';
 import { CircularProgress } from '@mui/material';
-import { SelectedVideoContext } from '../context/VideoUrl';
-import { ClipContext } from '../context/Clips';
-import { ClipVideo } from '../context/video';
-import { Video } from './Video';
+import { ClipContext } from '../context/ClipsContext';
+import { ClipVideo, Video } from '../entities/video';
+import { VideoPlayer } from './VideoPlayer';
 
 function* makeClipName() {
   let i = 0;
@@ -50,12 +49,15 @@ function* makeClipName() {
 
 const getClipName: Generator<string, string, string> = makeClipName();
 
-export const VideoControl = () => {
+interface Props {
+  selectedVideo: Video;
+}
+
+export const VideoControl: React.FC<Props> = ({ selectedVideo }) => {
   const [videoDuration, setVideoDuration] = useState(0);
   const [currentTime, setCurrentTime] = useState(0);
 
   const { dispatch } = useContext(AppEventContext);
-  const { selectedVideo } = useContext(SelectedVideoContext);
 
   const [selectedRange, setSelectedRange] = useState(new RangeData([0, 0]));
   const [playing, setPlaying] = useState(false);
@@ -99,7 +101,6 @@ export const VideoControl = () => {
     setClipping(true);
     getFFmpeg()
       .then(async (it) => {
-        const fileName = 'test.mp4';
         const outFileName = getClipName.next().value;
 
         const input = await selectedVideo!.getPath();
@@ -112,11 +113,11 @@ export const VideoControl = () => {
         );
         dispatch(AppEvents.ReadFile.message);
 
+        setClipping(false);
         const clip = new ClipVideo(outFileName);
         addClip(clip);
 
         videoRef2.current!.src = await clip.getUrl();
-        setClipping(false);
       })
       .catch((e) => {
         console.error(e);
@@ -165,13 +166,11 @@ export const VideoControl = () => {
     return () => clearInterval(id);
   });
 
-  const videoUrl = selectedVideo?.getUrl() || '';
-
   return (
     <div className={styles.videoControl}>
       <Suspense fallback={'loading...'}>
         {selectedVideo ? (
-          <Video
+          <VideoPlayer
             videoRef={videoRef}
             onEnded={onEnded}
             onLoadedData={onLoadedData}
@@ -194,10 +193,15 @@ export const VideoControl = () => {
         />
       </Option>
       <div className={styles.commandArea}>
-        <ToggleButton onClick={setRepeat} isActive={repeat}>
+        <ToggleButton
+          onClick={setRepeat}
+          isActive={repeat}
+          popOver={'リピート'}
+        >
           <RepeatIcon />
         </ToggleButton>
         <ToggleButton
+          popOver={'ラベルの間のみ再生します'}
           onClick={setPlayOnlySelectedRange}
           isActive={playOnlySelectedRange}
         >
@@ -210,6 +214,7 @@ export const VideoControl = () => {
               selectedRange.data[1],
             ])
           }
+          popOver={'右向きラベルを現在の再生位置に移動します'}
         >
           <LabelLeft />
         </IconButton>
@@ -220,12 +225,17 @@ export const VideoControl = () => {
               videoRef.current?.currentTime || 0,
             ])
           }
+          popOver={'左向きラベルを現在の再生位置に移動します'}
         >
           <LabelRight />
         </IconButton>
         <PlayStopButton playing={playing} videoRef={videoRef.current!} />
 
-        <IconButton disabled={clipping} onClick={onSliceButtonClicked}>
+        <IconButton
+          disabled={clipping}
+          onClick={onSliceButtonClicked}
+          popOver={'ラベルの間の範囲を切り抜きます'}
+        >
           {clipping ? <CircularProgress size={24} /> : <CutIcon />}
         </IconButton>
       </div>

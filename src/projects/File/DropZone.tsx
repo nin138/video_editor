@@ -18,6 +18,12 @@ const validator: <T extends File>(file: T) => FileError | FileError[] | null = (
       message: file.type,
     };
   }
+  if (file.size > 2147483648) {
+    return {
+      code: ErrorCode.FileTooLarge,
+      message: 'file too large max file size = 2gb',
+    };
+  }
   return null;
 };
 
@@ -25,6 +31,17 @@ export const Dropzone: React.FC<Props> = ({ onDrop, children }) => {
   const { getRootProps, getInputProps, isDragActive } = useDropzone({
     onDrop,
     validator,
+    onDropRejected: (fileRejections) => {
+      console.log(fileRejections);
+      window.alert(
+        fileRejections
+          .map(
+            (it) =>
+              it.file.name + ':  ' + it.errors.map((it) => it.message).join(' ')
+          )
+          .join('\n')
+      );
+    },
   });
 
   const { onClick, ...rootProps } = getRootProps();
@@ -34,10 +51,12 @@ export const Dropzone: React.FC<Props> = ({ onDrop, children }) => {
       <Option display={isDragActive}>
         <div className={styles.hover} />
       </Option>
-      <div className={styles.head} onClick={onClick}>
-        {isDragActive
-          ? 'Drop the files here ...'
-          : 'Drag and drop mp4 files or click here'}
+      <div
+        className={styles.head}
+        onClick={onClick}
+        style={{ cursor: 'pointer' }}
+      >
+        {isDragActive ? 'ここにドロップしてね' : 'ファイルを選択'}
         <FolderIcon className={styles.folderIcon} />
       </div>
       {children}

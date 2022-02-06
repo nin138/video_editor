@@ -1,5 +1,5 @@
 import React, { MutableRefObject, ReactEventHandler } from 'react';
-import { Video as VIDEO } from '../context/video';
+import { Video as VIDEO } from '../entities/video';
 
 interface Props {
   videoRef: MutableRefObject<HTMLVideoElement | null>;
@@ -11,7 +11,7 @@ interface Props {
   video: VIDEO;
 }
 
-export const Video: React.FC<Props> = ({
+export const VideoPlayer: React.FC<Props> = ({
   video,
   videoRef,
   onPause,

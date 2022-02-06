@@ -56,7 +56,7 @@ export const TimeSlider: React.FC<Props> = ({
   onRangeChanged,
   range,
 }) => {
-  const [step, setStep] = useState(Step.Min);
+  const [step, setStep] = useState(Step.All);
 
   const updateStep = (step: Step) => {
     if (!videoRef) return;

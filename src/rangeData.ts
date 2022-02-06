@@ -13,14 +13,19 @@ export class RangeData {
     return new RangeData(data);
   }
 
+  private sorted() {
+    return Array.from(this.data).sort((a, b) => a - b);
+  }
+
   start() {
     console.log(this.data);
-    console.log(this.data.sort());
-    return this.data.sort()[0];
+    console.log(this.sorted());
+
+    return this.sorted()[0];
   }
 
   end() {
-    return this.data.sort()[1];
+    return this.sorted()[1];
   }
 
   duration() {
