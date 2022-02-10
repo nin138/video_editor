@@ -1,5 +1,5 @@
 import React from 'react';
-import styles from '../WsItem.module.css';
+import styles from './WsItem.module.css';
 
 export interface WsVideoViewProps {
   name: string;
@@ -13,7 +13,10 @@ export const WsVideoView: React.VFC<WsVideoViewProps> = ({
   width,
 }) => {
   return (
-    <div style={{ height: '20px', background: color, width: width }}>
+    <div
+      className={styles.wsVideoView}
+      style={{ background: color, width: width }}
+    >
       {name}
     </div>
   );

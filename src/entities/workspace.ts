@@ -11,6 +11,7 @@ export interface Workspace {
 export interface WsVideoItem {
   video: Video;
   startTime: number;
+  duration: number;
 }
 
 export const SelectedItemType = {

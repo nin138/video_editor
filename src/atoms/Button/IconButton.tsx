@@ -2,7 +2,7 @@ import React from 'react';
 import styles from './Button.module.css';
 import { ButtonBase } from '@mui/material';
 import Popover from '@mui/material/Popover';
-import popoverStyle from './PopOver.module.css';
+import popoverStyle from '../PopOver.module.css';
 
 interface Props {
   onClick: () => void;

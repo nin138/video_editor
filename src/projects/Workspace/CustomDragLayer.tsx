@@ -61,7 +61,7 @@ export const CustomDragLayer: React.VFC<CustomDragLayerProps> = (props) => {
           <WsVideoView
             name={item.video.fileName()}
             color={'#f00'}
-            width={100}
+            width={item.duration * item.pxPerSec}
           />
         );
     }

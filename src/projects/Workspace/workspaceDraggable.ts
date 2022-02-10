@@ -3,7 +3,6 @@ import { Video } from '../../entities/video';
 export const DragItemType = {
   Video: 'Video',
   WorkspaceVideo: 'WorkspaceVideo',
-  WorkSpaceItem: 'WorkSpaceItem',
 } as const;
 
 export interface WorkspaceDragItem {
@@ -18,6 +17,7 @@ export interface DraggingWsVideo {
   startTime: number;
   duration: number;
   index: number;
+  pxPerSec: number;
 }
 
 export interface DraggingVideo {

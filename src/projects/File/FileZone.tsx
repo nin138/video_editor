@@ -6,7 +6,7 @@ import { classNames } from '../../util';
 import { LocalVideo, Video } from '../../entities/video';
 import { ClipContext } from '../../context/ClipsContext';
 import { Workspaces } from './Workspaces';
-import { WorkspaceContext } from '../../context/WorkspaceContext';
+import { WorkspaceContext } from '../../context/workspace/WorkspaceContext';
 import { SelectedItemType } from '../../entities/workspace';
 
 const NoItem: React.FC = () => {
@@ -19,11 +19,10 @@ const NoItem: React.FC = () => {
 
 export const FileZone: React.FC = () => {
   const [files, setFiles] = useState<LocalVideo[]>([]);
-  const selectedItemContext = useContext(WorkspaceContext);
+  const { selectedItem, setSelectedItem, dispatcher } =
+    useContext(WorkspaceContext);
   const selectedVideoId =
-    selectedItemContext.selectedItemType === SelectedItemType.Video
-      ? selectedItemContext.selectedItem.id
-      : '';
+    selectedItem.type === SelectedItemType.Video ? selectedItem.item.id : '';
 
   const onFileDrop = (newFiles: File[]) => {
     setFiles((current) => [
@@ -33,7 +32,7 @@ export const FileZone: React.FC = () => {
   };
 
   const onFileClick = async (video: Video) => {
-    selectedItemContext.setSelectedItem(video);
+    setSelectedItem(video);
   };
 
   const { clips } = useContext(ClipContext);
@@ -48,6 +47,11 @@ export const FileZone: React.FC = () => {
           selected={selectedVideoId === it.id}
           video={it}
           onClick={() => onFileClick(it)}
+          addToWorkspace={
+            selectedItem.type === SelectedItemType.Workspace
+              ? (video) => dispatcher.addVideoToWs(selectedItem.item.id, video)
+              : undefined
+          }
         />
       ))
     );

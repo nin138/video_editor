@@ -12,10 +12,12 @@
   background: rgba(255, 255, 255, 0.1);
   display: flex;
   overflow-x: scroll;
+  height: 200px;
 }
 
 .scrollLeft {
-  width: 100px;
+  width: 200px;
+  min-width: 200px;
   position: sticky;
   left: 0;
   z-index: 1;
@@ -24,4 +26,6 @@
 
 .scrollInner {
   width: fit-content;
+  min-width: calc(100% - 300px);
+  margin-left: 20px;
 }

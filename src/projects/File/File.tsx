@@ -1,44 +1,86 @@
 import React, { useState } from 'react';
 import styles from './File.module.css';
 import { Video } from '../../entities/video';
+import { classNames, getResource } from '../../util';
+import { FileView } from './FileView';
+import { useDrag } from 'react-dnd';
+import { DraggingVideo, DragItemType } from '../Workspace/workspaceDraggable';
+import { CircularProgress } from '@mui/material';
 import { IconButton } from '../../atoms/Button/IconButton';
-import { DownloadIcon } from '../../atoms/Icons';
-import { classNames } from '../../util';
+import { AddToWorkspaceIcon, DownloadIcon } from '../../atoms/Icons';
 
 interface Props {
   video: Video;
   onClick: () => void;
   selected: boolean;
+  addToWorkspace?: (video: Video) => void;
 }
 
-export const File: React.FC<Props> = ({ video, onClick, selected }) => {
+export const File: React.FC<Props> = ({
+  video,
+  onClick,
+  selected,
+  addToWorkspace,
+}) => {
   const dlRef = React.createRef<HTMLAnchorElement>();
   const [dlWaiting, setDlWaiting] = useState(false);
 
   const download = async () => {
+    const a = dlRef.current;
     setDlWaiting(true);
-    let url = video.getUrl();
-    if (url instanceof Promise) {
-      url = await url;
-    }
-    dlRef.current!.href = url;
-    dlRef.current!.click();
-    setDlWaiting(false);
+    const url = await getResource(video.getUrl());
+    a!.href = url;
+    a!.click();
+    setDlWaiting(false); // todo when too fast
   };
 
+  const [, drag] = useDrag<DraggingVideo, unknown, { isDragging: boolean }>(
+    () => ({
+      type: DragItemType.Video,
+      item: (monitor) => ({
+        type: DragItemType.Video,
+        video: video,
+      }),
+      collect: (monitor) => ({
+        isDragging: monitor.isDragging(),
+        xy: monitor.getClientOffset(),
+      }),
+    })
+  );
+
+  const dl = dlWaiting ? (
+    <CircularProgress size={24} />
+  ) : (
+    <IconButton
+      onClick={download}
+      className={styles.dlIconButton}
+      popOver={'ダウンロード'}
+    >
+      <DownloadIcon className={styles.dlIcon} />
+    </IconButton>
+  );
+
+  const addToWs = addToWorkspace ? (
+    <IconButton
+      className={styles.dlIconButton}
+      onClick={() => addToWorkspace(video)}
+      popOver={'workspaceに追加する'}
+    >
+      <AddToWorkspaceIcon className={styles.dlIcon} />
+    </IconButton>
+  ) : null;
+
   return (
-    <div className={classNames(styles.file, selected ? styles.selected : '')}>
-      <div onClick={onClick} className={styles.fileName}>
-        {video.fileName()}
-      </div>
-      <a ref={dlRef} download={video.fileName()} />
-      <IconButton
-        onClick={download}
-        className={styles.dlIconButton}
-        popOver={'ダウンロード'}
+    <div ref={drag}>
+      <FileView
+        onClick={onClick}
+        selected={selected}
+        fileName={video.fileName()}
       >
-        <DownloadIcon className={styles.dlIcon} />
-      </IconButton>
+        {addToWs}
+        {dl}
+      </FileView>
+      <a ref={dlRef} download={video.fileName()} />
     </div>
   );
 };

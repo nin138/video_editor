@@ -10,6 +10,7 @@ import ContentCutIcon from '@mui/icons-material/ContentCut';
 import FolderOpenIcon from '@mui/icons-material/FolderOpen';
 import DIcon from '@mui/icons-material/Download';
 import AddBoxIcon from '@mui/icons-material/AddBox';
+import PlayForWorkIcon from '@mui/icons-material/PlayForWork';
 
 interface Props {
   style?: React.CSSProperties;
@@ -46,3 +47,4 @@ export const CutIcon = ContentCutIcon;
 export const FolderIcon = FolderOpenIcon;
 export const DownloadIcon = DIcon;
 export const AddIcon = AddBoxIcon;
+export const AddToWorkspaceIcon = PlayForWorkIcon;

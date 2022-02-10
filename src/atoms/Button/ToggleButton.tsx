@@ -4,7 +4,7 @@ import { classNames } from '../../util';
 import { ButtonBase } from '@mui/material';
 import Popover from '@mui/material/Popover';
 import { Option } from '../Option';
-import popoverStyle from './PopOver.module.css';
+import popoverStyle from '../PopOver.module.css';
 
 interface Props {
   children: React.ReactNode;

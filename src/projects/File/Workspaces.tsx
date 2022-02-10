@@ -4,10 +4,10 @@ import { classNames } from '../../util';
 import { IconButton } from '../../atoms/Button/IconButton';
 import { AddIcon } from '../../atoms/Icons';
 import { WorkspaceName } from './WorkspaceName';
-import { WorkspaceContext } from '../../context/WorkspaceContext';
+import { WorkspaceContext } from '../../context/workspace/WorkspaceContext';
 
 export const Workspaces: React.FC = () => {
-  const { workspaces, addWorkSpace, selectedItem, setSelectedItem } =
+  const { workspaces, selectedItem, setSelectedItem, dispatcher } =
     useContext(WorkspaceContext);
 
   return (
@@ -16,7 +16,7 @@ export const Workspaces: React.FC = () => {
         <div className={styles.headText}>workspace</div>
         <IconButton
           className={styles.addWorkspaceIcon}
-          onClick={addWorkSpace}
+          onClick={dispatcher.addWorkspace}
           popOver={'新規ワークスペース'}
         >
           <AddIcon />
@@ -28,7 +28,7 @@ export const Workspaces: React.FC = () => {
             key={i}
             workspace={it}
             onClick={() => setSelectedItem(it)}
-            selected={selectedItem.id === it.id}
+            selected={selectedItem.item.id === it.id}
           />
         ))}
       </div>

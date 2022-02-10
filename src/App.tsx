@@ -6,7 +6,7 @@ import { ClipContextProvider } from './context/ClipsContext';
 import { Main } from './projects/Main';
 import { DndProvider } from 'react-dnd';
 import { HTML5Backend } from 'react-dnd-html5-backend';
-import { WorkspaceProvider } from './context/WorkspaceContext';
+import { WorkspaceProvider } from './context/workspace/WorkspaceContext';
 
 function App() {
   return (

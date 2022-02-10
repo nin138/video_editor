@@ -1,0 +1,10 @@
+.menu {
+  background: #333;
+  color: #eee;
+}
+
+.menuItem {
+}
+.menuItem:hover {
+  background: rgba(255, 255, 255, 0.2);
+}

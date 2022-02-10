@@ -1,6 +1,5 @@
 import { createFFmpeg, fetchFile, LogCallback } from '@ffmpeg/ffmpeg';
-import { type } from '@testing-library/user-event/dist/type';
-
+import { nanoid } from 'nanoid';
 export const FILE_DIR = '/files/';
 export const CLIP_DIR = '/clips/';
 
@@ -41,11 +40,11 @@ class FFmpeg {
     await r;
   }
 
-  async getDuration(fileName: string) {
+  async getDuration(fileName: string): Promise<number> {
     return new Promise((resolve, reject) => {
       const logger: LogCallback = ({ type, message }) => {
         if (message.includes('Duration')) {
-          const regex = /Duration.*(\d{2})\:(\d{2})\:(\d{2})\.(\d{2})/gm;
+          const regex = /.*Duration.*(\d{2})\:(\d{2})\:(\d{2})\.(\d{2})/gm;
           const matches = regex.exec(String(message));
           if (matches != null) {
             const h = Number(matches[1]);
@@ -90,6 +89,29 @@ class FFmpeg {
       'copy',
       CLIP_DIR + outFileName
     );
+  }
+
+  async concatVideos(outputFileName: string, ...paths: string[]) {
+    const fileList = paths.map((it) => `file ${it}`).join('\n');
+    const path = `/${nanoid()}.txt`;
+    await this.ffmpeg.FS('writeFile', path, new TextEncoder().encode(fileList));
+    const result = this.ffmpeg.run(
+      '-f',
+      'concat',
+      '-safe',
+      '0',
+      '-i',
+      path,
+      '-c',
+      'copy',
+      CLIP_DIR + outputFileName
+    );
+    this.rmFile(path);
+    return result;
+  }
+
+  rmFile(fileName: string) {
+    return this.ffmpeg.FS('unlink', fileName);
   }
 
   async makeDir(name: string) {

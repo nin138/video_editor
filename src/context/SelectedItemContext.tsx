@@ -5,7 +5,7 @@ import {
   SelectedItemType,
   Workspace,
 } from '../entities/workspace';
-import { WorkspaceContext } from './WorkspaceContext';
+import { WorkspaceContext } from './workspace/WorkspaceContext';
 
 interface VideoContext {
   type: typeof SelectedItemType.Video;

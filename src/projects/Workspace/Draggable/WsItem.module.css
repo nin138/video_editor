@@ -1,0 +1,12 @@
+.video {
+  height: 20px;
+  position: absolute;
+  transition: all 0.1s ease-in-out;
+}
+
+.wsVideoView {
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  height: 40px;
+  overflow: hidden;
+}

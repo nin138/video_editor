@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from 'react';
 
 export const useElementRect = (
-  ref: React.MutableRefObject<HTMLElement | undefined>
+  ref: React.RefObject<HTMLElement | undefined>
 ): DOMRect | undefined => {
   const [rect, setRect] = useState<DOMRect>();
   useEffect(() => {

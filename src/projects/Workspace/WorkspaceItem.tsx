@@ -1,6 +1,6 @@
-import React, { useRef } from 'react';
-import { useDrag, useDrop } from 'react-dnd';
-import { DragItemType, WorkspaceDragItem } from './workspaceDraggable';
+import React from 'react';
+import { useDrag } from 'react-dnd';
+import { DraggingVideo, DragItemType } from './workspaceDraggable';
 import { WsVideoItem } from '../../entities/workspace';
 
 interface Props {
@@ -11,15 +11,21 @@ interface Props {
 type WithIndex<T> = { index: number } & T;
 
 export const WorkSpaceItem: React.VFC<Props> = ({ item }) => {
-  const [{ isDragging }, drag] = useDrag(() => ({
+  const [{ isDragging }, drag] = useDrag<
+    DraggingVideo,
+    { cb: (x?: number) => void },
+    { isDragging: boolean }
+  >(() => ({
     type: DragItemType.Video,
     item: (monitor) => ({
       type: DragItemType.Video,
       ...item,
       initialX: monitor.getInitialClientOffset()!.x,
+      xy: monitor.getClientOffset(),
     }),
     collect: (monitor) => ({
       isDragging: monitor.isDragging(),
+      xy: monitor.getClientOffset(),
     }),
   }));
 

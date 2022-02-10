@@ -26,28 +26,7 @@ import { CircularProgress } from '@mui/material';
 import { ClipContext } from '../context/ClipsContext';
 import { ClipVideo, Video } from '../entities/video';
 import { VideoPlayer } from './VideoPlayer';
-
-function* makeClipName() {
-  let i = 0;
-  while (true) {
-    i++;
-    const date = new Date();
-    yield 'clip' +
-      i +
-      '-' +
-      date.getFullYear() +
-      '-' +
-      (date.getMonth() + 1) +
-      '-' +
-      date.getDate() +
-      '__' +
-      date.toLocaleTimeString() +
-      '.mp4';
-  }
-  return '';
-}
-
-const getClipName: Generator<string, string, string> = makeClipName();
+import { getClipName } from '../ffmpeg/getFileName';
 
 interface Props {
   selectedVideo: Video;

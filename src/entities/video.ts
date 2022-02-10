@@ -21,8 +21,9 @@ abstract class VideoBase implements Video {
     if (this.duration) return this.duration;
     const path = await getResource(this.getPath());
     const ffmpeg = await getFFmpeg();
-    await ffmpeg.getInfo(path);
-    return 0;
+    this.duration = ffmpeg.getDuration(path);
+
+    return this.duration;
   }
 
   abstract fileName(): string;
