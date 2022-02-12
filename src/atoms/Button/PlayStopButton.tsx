@@ -4,14 +4,10 @@ import { ToggleButton } from './ToggleButton';
 
 interface Props {
   playing: boolean;
-  videoRef: HTMLVideoElement;
+  onClick: () => void;
 }
 
-export const PlayStopButton: React.FC<Props> = ({ videoRef, playing }) => {
-  const onClick = () => {
-    if (playing) videoRef.pause();
-    else videoRef.play();
-  };
+export const PlayStopButton: React.FC<Props> = ({ playing, onClick }) => {
   return (
     <ToggleButton
       onClick={onClick}

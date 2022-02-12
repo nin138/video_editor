@@ -27,10 +27,13 @@ import { ClipContext } from '../context/ClipsContext';
 import { ClipVideo, Video } from '../entities/video';
 import { VideoPlayer } from './VideoPlayer';
 import { getClipName } from '../ffmpeg/getFileName';
+import { loop } from '../loop';
 
 interface Props {
   selectedVideo: Video;
 }
+
+let time = Date.now();
 
 export const VideoControl: React.FC<Props> = ({ selectedVideo }) => {
   const [videoDuration, setVideoDuration] = useState(0);
@@ -208,7 +211,14 @@ export const VideoControl: React.FC<Props> = ({ selectedVideo }) => {
         >
           <LabelRight />
         </IconButton>
-        <PlayStopButton playing={playing} videoRef={videoRef.current!} />
+        <PlayStopButton
+          playing={playing}
+          onClick={() => {
+            if (playing) videoRef.current!.pause();
+            else videoRef.current!.play();
+            setPlaying(!playing);
+          }}
+        />
 
         <IconButton
           disabled={clipping}

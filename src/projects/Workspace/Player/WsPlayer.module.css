@@ -1,0 +1,22 @@
+.videoArea {
+  position: relative;
+  height: 500px;
+}
+
+.video {
+  /*position: absolute;*/
+  z-index: 0;
+}
+
+.controls {
+  display: flex;
+  background: var(--elevate);
+}
+
+.time {
+  margin: 0 12px;
+}
+
+.timeSeparator {
+  margin: 8px;
+}

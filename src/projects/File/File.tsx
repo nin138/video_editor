@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useEffect, useRef, useState } from 'react';
 import styles from './File.module.css';
 import { Video } from '../../entities/video';
 import { classNames, getResource } from '../../util';
@@ -8,6 +8,7 @@ import { DraggingVideo, DragItemType } from '../Workspace/workspaceDraggable';
 import { CircularProgress } from '@mui/material';
 import { IconButton } from '../../atoms/Button/IconButton';
 import { AddToWorkspaceIcon, DownloadIcon } from '../../atoms/Icons';
+import { getEmptyImage } from 'react-dnd-html5-backend';
 
 interface Props {
   video: Video;
@@ -22,7 +23,7 @@ export const File: React.FC<Props> = ({
   selected,
   addToWorkspace,
 }) => {
-  const dlRef = React.createRef<HTMLAnchorElement>();
+  const dlRef = useRef<HTMLAnchorElement>(null);
   const [dlWaiting, setDlWaiting] = useState(false);
 
   const download = async () => {
@@ -34,19 +35,25 @@ export const File: React.FC<Props> = ({
     setDlWaiting(false); // todo when too fast
   };
 
-  const [, drag] = useDrag<DraggingVideo, unknown, { isDragging: boolean }>(
-    () => ({
+  const [, drag, preview] = useDrag<
+    DraggingVideo,
+    unknown,
+    { isDragging: boolean }
+  >(() => ({
+    type: DragItemType.Video,
+    item: (monitor) => ({
       type: DragItemType.Video,
-      item: (monitor) => ({
-        type: DragItemType.Video,
-        video: video,
-      }),
-      collect: (monitor) => ({
-        isDragging: monitor.isDragging(),
-        xy: monitor.getClientOffset(),
-      }),
-    })
-  );
+      video: video,
+    }),
+    collect: (monitor) => ({
+      isDragging: monitor.isDragging(),
+      xy: monitor.getClientOffset(),
+    }),
+  }));
+
+  useEffect(() => {
+    preview(getEmptyImage(), { captureDraggingState: true });
+  }, []);
 
   const dl = dlWaiting ? (
     <CircularProgress size={24} />

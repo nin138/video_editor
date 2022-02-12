@@ -23,6 +23,7 @@ interface AddVideoToWorkspace {
   type: typeof WsActionTypes.AddVideoToWorkspace;
   wsId: string;
   duration: number;
+  url: string;
   video: Video;
 }
 
@@ -69,6 +70,7 @@ export class WorkspaceActionDispatcher {
       wsId,
       video,
       duration: await getResource(video.getDuration()),
+      url: await getResource(video.getUrl()),
     });
   };
 

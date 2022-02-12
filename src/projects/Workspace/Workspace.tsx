@@ -1,4 +1,4 @@
-import React, { createRef, useContext, useRef, useState } from 'react';
+import React, { useContext, useRef, useState } from 'react';
 import { useDrop } from 'react-dnd';
 import { DragItemType, WsVideoDroppable } from './workspaceDraggable';
 import { WorkSpaceItem } from './WorkspaceItem';
@@ -16,6 +16,7 @@ import { getOutputFileName } from '../../ffmpeg/getFileName';
 import { ClipContext } from '../../context/ClipsContext';
 import { Slider } from '@mui/material';
 import { WorkspaceActionDispatcher } from '../../context/workspace/WorkspaceAction';
+import { WsPlayer } from './Player/WsPlayer';
 
 const ditems: WsVideoItem[] = [
   {
@@ -29,6 +30,7 @@ const ditems: WsVideoItem[] = [
     },
     startTime: 0,
     duration: 4,
+    url: 'hoge',
   },
   {
     video: {
@@ -41,6 +43,7 @@ const ditems: WsVideoItem[] = [
     },
     startTime: 5,
     duration: 8,
+    url: 'hoge',
   },
   {
     video: {
@@ -53,6 +56,7 @@ const ditems: WsVideoItem[] = [
     },
     startTime: 12,
     duration: 5,
+    url: 'hoge',
   },
 ];
 
@@ -74,28 +78,15 @@ const SCROLL_LEFT_WIDTH = 250;
 export const WorkSpace: React.VFC<Props> = ({ workspace, wsDispatcher }) => {
   const videoItems = workspace.videoItems;
 
-  const duration = workspace.videoItems.reduce(
-    (previousValue, currentValue) => previousValue + currentValue.duration,
-    0
-  );
-
-  const areaRef = createRef<HTMLDivElement>();
+  const areaRef = useRef<HTMLDivElement>(null);
   const scrollRect = useElementRect(areaRef);
 
   // const OneSecWidth = (duration === 0 || (scrollRect?.width || 0) === 0) ? 30 : ((scrollRect?.width || 200) - SCROLL_LEFT_WIDTH) / (duration + 1);
 
   const [OneSecWidth, setOneSecWidth] = useState(30);
 
-  // const OneSecWidth = 30;
-  console.log(scrollRect?.width);
-  console.log('osw', OneSecWidth);
-  console.log('d', duration);
-
-  const addItem = (item: WsVideoItem) => {
-    wsDispatcher.updateWorkspace(workspace.id, (workspace) => ({
-      ...workspace,
-      videoItems: [...workspace.videoItems, item],
-    }));
+  const addItem = (video: Video) => {
+    wsDispatcher.addVideoToWs(workspace.id, video);
   };
 
   const updateItems = (...newItems: WsVideoItem[]) => {
@@ -126,20 +117,9 @@ export const WorkSpace: React.VFC<Props> = ({ workspace, wsDispatcher }) => {
         if (!x) return;
 
         if (item.type === DragItemType.Video) {
-          getResource(item.video.getDuration()).then((duration) => {
-            console.log('before add item, duration: ' + duration);
-            addItem({
-              video: item.video,
-              startTime: videoItems.reduce(
-                (previousValue, currentValue) =>
-                  previousValue + currentValue.duration,
-                0
-              ),
-              duration,
-            });
-          });
+          addItem(item.video);
         } else if (item.type === DragItemType.WorkspaceVideo) {
-          return;
+          return; // TODO when not snap
         }
       },
     }),
@@ -183,6 +163,7 @@ export const WorkSpace: React.VFC<Props> = ({ workspace, wsDispatcher }) => {
 
   return (
     <div className={styles.wrap}>
+      <WsPlayer workspace={workspace} />
       <Slider
         onChange={(_, value) => setOneSecWidth(value as number)}
         min={1}
@@ -199,7 +180,7 @@ export const WorkSpace: React.VFC<Props> = ({ workspace, wsDispatcher }) => {
           <div>video</div>
         </div>
         <div className={styles.scrollInner}>
-          <Scale duration={duration} pxPerSec={OneSecWidth} />
+          <Scale duration={workspace.duration} pxPerSec={OneSecWidth} />
           <div className={styles.videoArea} ref={ref}>
             {videoItems.map((it, i) => (
               <WsDraggableVideo

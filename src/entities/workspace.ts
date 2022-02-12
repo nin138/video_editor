@@ -6,12 +6,14 @@ export interface Workspace {
   id: string;
   name: string;
   videoItems: WsVideoItem[];
+  duration: number;
 }
 
 export interface WsVideoItem {
   video: Video;
   startTime: number;
   duration: number;
+  url: string;
 }
 
 export const SelectedItemType = {
@@ -24,4 +26,5 @@ export const getDefaultWorkspace = (i: number): Workspace => ({
   name: 'workspace' + (i + 1),
   id: nanoid(),
   videoItems: [],
+  duration: 0,
 });

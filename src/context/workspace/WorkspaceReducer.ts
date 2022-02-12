@@ -10,6 +10,16 @@ export interface WorkspaceState {
   workspaces: Workspace[];
 }
 
+const calcDuration = (ws: Workspace): Workspace => {
+  return {
+    ...ws,
+    duration: ws.videoItems.reduce(
+      (previousValue, currentValue) => previousValue + currentValue.duration,
+      0
+    ),
+  };
+};
+
 export const workspaceReducer: Reducer<WorkspaceState, WorkspaceAction> = (
   prevState,
   action
@@ -18,7 +28,7 @@ export const workspaceReducer: Reducer<WorkspaceState, WorkspaceAction> = (
     return {
       ...prevState,
       workspaces: prevState.workspaces.map((it) =>
-        it.id === wsId ? cb(it) : it
+        it.id === wsId ? calcDuration(cb(it)) : it
       ),
     };
   };
@@ -46,6 +56,7 @@ export const workspaceReducer: Reducer<WorkspaceState, WorkspaceAction> = (
               previousValue + currentValue.duration,
             0
           ),
+        url: action.url,
       };
       return updateWs(action.wsId, (ws) => ({
         ...ws,
