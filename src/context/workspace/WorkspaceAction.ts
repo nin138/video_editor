@@ -30,14 +30,10 @@ interface AddVideoToWorkspace {
 interface RemoveVideoFromWs {
   type: typeof WsActionTypes.RemoveVideoFromWs;
   wsId: string;
-  video: Video;
+  itemId: string;
 }
 
-export type WorkspaceAction =
-  | AddWorkSpaceAction
-  | UpdateWorkSpace
-  | AddVideoToWorkspace
-  | RemoveVideoFromWs;
+export type WorkspaceAction = AddWorkSpaceAction | UpdateWorkSpace | AddVideoToWorkspace | RemoveVideoFromWs;
 
 export class WorkspaceActionDispatcher {
   constructor(private _dispatch: (action: WorkspaceAction) => void) {}
@@ -53,10 +49,7 @@ export class WorkspaceActionDispatcher {
     });
   };
 
-  updateWorkspace = (
-    wsId: string,
-    updater: (workspace: Workspace) => Workspace
-  ) => {
+  updateWorkspace = (wsId: string, updater: (workspace: Workspace) => Workspace) => {
     this.dispatch({
       type: WsActionTypes.UpdateWorkspace,
       wsId,
@@ -74,11 +67,11 @@ export class WorkspaceActionDispatcher {
     });
   };
 
-  removeVideoFromWs = (wsId: string, video: Video) => {
+  removeVideoFromWs = (wsId: string, itemId: string) => {
     return this.dispatch({
       type: WsActionTypes.RemoveVideoFromWs,
       wsId,
-      video,
+      itemId,
     });
   };
 }

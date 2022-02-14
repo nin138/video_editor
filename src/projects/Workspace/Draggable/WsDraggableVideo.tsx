@@ -1,42 +1,33 @@
-import React, { useEffect, useRef, useState } from 'react';
+import React, { useEffect, useRef } from 'react';
 import styles from './WsItem.module.css';
-import { Video } from '../../../entities/video';
 import { useDrag, useDrop, XYCoord } from 'react-dnd';
 import { DraggingWsVideo, DragItemType } from '../workspaceDraggable';
-import { classNames, useCombinedRefs } from '../../../util';
+import { useCombinedRefs } from '../../../util';
 import { getEmptyImage } from 'react-dnd-html5-backend';
 import { WsVideoView } from './WsVideoView';
 import { useElementRect } from '../../../hooks/useElementRect';
 import { PopOver } from '../../../atoms/PopOver';
 import { ContextMenu } from './ContextMenu';
+import { WsVideoItem } from '../../../entities/workspace';
+import { calcTransform } from '../translate';
 
 interface Props {
-  video: Video;
-  color: string;
+  item: WsVideoItem;
   index: number;
-  duration: number;
-  startTime: number;
   onItemHover: (draggingId: string, targetId: string) => void;
   pxPerSec: number;
   removeVideo: () => void;
 }
 
-export const WsDraggableVideo: React.VFC<Props> = ({
-  video,
-  color,
-  duration,
-  startTime,
-  onItemHover,
-  pxPerSec,
-  removeVideo,
-}) => {
-  const item: DraggingWsVideo = {
+export const WsDraggableVideo: React.VFC<Props> = ({ item, onItemHover, pxPerSec, removeVideo }) => {
+  const dragItem: DraggingWsVideo = {
     type: DragItemType.WorkspaceVideo,
-    video,
-    startTime,
-    duration,
+    itemId: item.itemId,
+    video: item.video,
+    startTime: item.startTime,
+    duration: item.duration,
+    color: item.color,
     pxPerSec,
-    color,
   };
 
   const draggableRef = useRef<HTMLElement>();
@@ -56,10 +47,8 @@ export const WsDraggableVideo: React.VFC<Props> = ({
       type: DragItemType.WorkspaceVideo,
       item: (monitor) => {
         return {
-          ...item,
-          initialX:
-            monitor.getClientOffset()!.x -
-            draggableRef.current!.getBoundingClientRect().left,
+          ...dragItem,
+          initialX: monitor.getClientOffset()!.x - draggableRef.current!.getBoundingClientRect().left,
           xy: monitor.getClientOffset(),
         };
       },
@@ -67,7 +56,7 @@ export const WsDraggableVideo: React.VFC<Props> = ({
         isDragging: monitor.isDragging(),
       }),
     }),
-    [startTime, pxPerSec]
+    [item.startTime, pxPerSec]
   );
 
   const [, drop] = useDrop<DraggingWsVideo, unknown, unknown>(
@@ -75,29 +64,17 @@ export const WsDraggableVideo: React.VFC<Props> = ({
       accept: DragItemType.WorkspaceVideo,
       hover: (dragging, monitor) => {
         console.log('hover');
-        if (dragging.video.id === video.id) return;
+        if (dragging.itemId === item.itemId) return;
         const mousePosition = monitor.getClientOffset();
         if (!mousePosition || !rect) return;
 
         const hoverClientX = mousePosition.x - rect.left;
         const hoverMiddleX = rect.width / 2;
-        console.log('hover2');
-        if (
-          dragging.startTime < item.startTime &&
-          hoverClientX < hoverMiddleX * 0.6
-        )
-          return;
-        if (
-          dragging.startTime > item.startTime &&
-          hoverClientX > hoverMiddleX * 1.6
-        )
-          return;
+        if (dragging.startTime < item.startTime && hoverClientX < hoverMiddleX * 0.6) return;
+        if (dragging.startTime > item.startTime && hoverClientX > hoverMiddleX * 1.6) return;
         console.log('hover3');
-        onItemHover(dragging.video.id, video.id);
-        dragging.startTime =
-          dragging.startTime > item.startTime
-            ? item.startTime
-            : dragging.startTime + item.duration;
+        onItemHover(dragging.itemId, item.itemId);
+        dragging.startTime = dragging.startTime > item.startTime ? item.startTime : dragging.startTime + item.duration;
       },
     }),
     [onItemHover]
@@ -108,15 +85,12 @@ export const WsDraggableVideo: React.VFC<Props> = ({
   return (
     <div
       ref={ref}
-      className={classNames(styles.video)}
+      className={styles.video}
       style={{
-        transform: `translate(${startTime * pxPerSec}px)`,
+        transform: calcTransform(item.startTime, pxPerSec),
       }}
     >
-      <ContextMenu
-        id={video.id}
-        menu={[{ title: '削除', onClick: removeVideo }]}
-      >
+      <ContextMenu id={item.itemId} menu={[{ title: '削除', onClick: removeVideo }]}>
         {(props) => (
           <div
             id={props.id}
@@ -127,18 +101,18 @@ export const WsDraggableVideo: React.VFC<Props> = ({
           >
             <WsVideoView
               className={isDragging ? styles.dragging : ''}
-              name={video.fileName()}
-              color={isDragging ? '#555' : color}
-              width={duration * pxPerSec}
+              name={item.video.fileName()}
+              color={isDragging ? '#555555' : item.color}
+              width={item.duration * pxPerSec}
             />
           </div>
         )}
       </ContextMenu>
 
       <PopOver targetRef={draggableRef}>
-        {video.fileName()}
+        {item.video.fileName()}
         <br />
-        Duration: {duration}sec
+        Duration: {item.duration}sec
       </PopOver>
     </div>
   );

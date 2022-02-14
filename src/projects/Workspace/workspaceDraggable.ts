@@ -7,6 +7,7 @@ export const DragItemType = {
 
 export interface DraggingWsVideo {
   type: typeof DragItemType.WorkspaceVideo;
+  itemId: string;
   video: Video;
   startTime: number;
   duration: number;

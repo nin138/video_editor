@@ -6,16 +6,13 @@ import styles from './WsPlayer.module.css';
 
 const getTargetIndex = (workspace: Workspace, currentTime: number) => {
   return (
-    workspace.videoItems.length -
-    1 -
-    [...workspace.videoItems]
-      .reverse()
-      .findIndex((it) => it.startTime <= currentTime)
+    workspace.videoItems.length - 1 - [...workspace.videoItems].reverse().findIndex((it) => it.startTime <= currentTime)
   );
 };
 
 interface Props {
   workspace: Workspace;
+  onTimeUpdate: (time: number) => void;
 }
 
 const LOOP_ID = 'wsplayer';
@@ -23,14 +20,16 @@ const LOOP_ID = 'wsplayer';
 const rmLoop = () => loop.remove(LOOP_ID);
 const addLoop = (cb: () => void) => loop.add(LOOP_ID, cb);
 
-export const WsPlayer: React.VFC<Props> = ({ workspace }) => {
+export const WsPlayer: React.VFC<Props> = ({ workspace, onTimeUpdate }) => {
   const [currentTime, setCurrentTime] = useState(0);
   const [playing, setPlaying] = useState(false);
 
+  useEffect(() => {
+    onTimeUpdate(currentTime);
+  }, [currentTime, onTimeUpdate]);
+
   const videoRefs = useRef<React.RefObject<HTMLVideoElement>[]>([]);
-  videoRefs.current = workspace.videoItems.map(
-    (_, i) => videoRefs.current[i] ?? createRef()
-  );
+  videoRefs.current = workspace.videoItems.map((_, i) => videoRefs.current[i] ?? createRef());
 
   const targetIndex = getTargetIndex(workspace, currentTime);
   const targetInfo = workspace.videoItems[targetIndex];
@@ -38,11 +37,7 @@ export const WsPlayer: React.VFC<Props> = ({ workspace }) => {
 
   const onPlayClick = () => {
     if (!playing) {
-      console.log(
-        currentTime,
-        workspace.duration,
-        currentTime >= workspace.duration
-      );
+      console.log(currentTime, workspace.duration, currentTime >= workspace.duration);
       if (currentTime >= workspace.duration) {
         console.log('c');
         setCurrentTime(0);

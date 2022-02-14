@@ -10,6 +10,7 @@ export interface Workspace {
 }
 
 export interface WsVideoItem {
+  itemId: string;
   video: Video;
   startTime: number;
   duration: number;

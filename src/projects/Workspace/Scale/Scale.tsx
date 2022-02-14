@@ -1,4 +1,4 @@
-import React, { ReactElement } from 'react';
+import React from 'react';
 import styles from '../Scale.module.css';
 import { ScaleItem } from './ScaleItem';
 import { getScaleConfig } from './calcScale';
