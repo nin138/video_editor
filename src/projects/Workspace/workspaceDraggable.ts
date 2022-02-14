@@ -5,19 +5,13 @@ export const DragItemType = {
   WorkspaceVideo: 'WorkspaceVideo',
 } as const;
 
-export interface WorkspaceDragItem {
-  type: keyof typeof DragItemType;
-  video: Video;
-  startTime: number;
-}
-
 export interface DraggingWsVideo {
   type: typeof DragItemType.WorkspaceVideo;
   video: Video;
   startTime: number;
   duration: number;
-  index: number;
   pxPerSec: number;
+  color: string;
 }
 
 export interface DraggingVideo {

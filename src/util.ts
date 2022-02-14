@@ -29,3 +29,10 @@ export const getResource = async <T>(resource: T | Promise<T>): Promise<T> => {
   }
   return resource;
 };
+
+export const formatSec = (sec: number) => {
+  const minutes = Math.floor(sec / 60);
+  const seconds = sec % 60;
+
+  return `${minutes}:${seconds.toString().padStart(2, '0')}`;
+};

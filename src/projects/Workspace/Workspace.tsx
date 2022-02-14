@@ -1,14 +1,13 @@
 import React, { useContext, useRef, useState } from 'react';
 import { useDrop } from 'react-dnd';
 import { DragItemType, WsVideoDroppable } from './workspaceDraggable';
-import { WorkSpaceItem } from './WorkspaceItem';
 import styles from './Workspace.module.css';
 import { Scale } from './Scale/Scale';
 import { WsDraggableVideo } from './Draggable/WsDraggableVideo';
 import { ClipVideo, Video } from '../../entities/video';
-import { getResource, useCombinedRefs } from '../../util';
+import { classNames, getResource, useCombinedRefs } from '../../util';
 import { useElementRect } from '../../hooks/useElementRect';
-import { CustomDragLayer } from './CustomDragLayer';
+import { CustomDragLayer } from './Draggable/CustomDragLayer';
 import { Workspace, WsVideoItem } from '../../entities/workspace';
 import { swapPosition } from './Draggable/swapItemPosition';
 import { getFFmpeg } from '../../ffmpeg/ffmpeg';
@@ -17,54 +16,6 @@ import { ClipContext } from '../../context/ClipsContext';
 import { Slider } from '@mui/material';
 import { WorkspaceActionDispatcher } from '../../context/workspace/WorkspaceAction';
 import { WsPlayer } from './Player/WsPlayer';
-
-const ditems: WsVideoItem[] = [
-  {
-    video: {
-      type: 'Video',
-      getUrl: () => '',
-      fileName: () => 'assss',
-      getPath: () => '',
-      getDuration: () => 4,
-      id: '1',
-    },
-    startTime: 0,
-    duration: 4,
-    url: 'hoge',
-  },
-  {
-    video: {
-      type: 'Video',
-      getUrl: () => '',
-      fileName: () => 'afehj',
-      getPath: () => '',
-      getDuration: () => 8,
-      id: '2',
-    },
-    startTime: 5,
-    duration: 8,
-    url: 'hoge',
-  },
-  {
-    video: {
-      type: 'Video',
-      getUrl: () => '',
-      fileName: () => 'ytujhty',
-      getPath: () => '',
-      getDuration: () => 5,
-      id: '3',
-    },
-    startTime: 12,
-    duration: 5,
-    url: 'hoge',
-  },
-];
-
-const COLORS = ['#f00', '#0f0', '#00f', '#ff0', '#f0f', '#0ff'];
-
-const getColor = (i: number): string => {
-  return COLORS[i % COLORS.length];
-};
 
 const SNAP = true;
 
@@ -103,17 +54,16 @@ export const WorkSpace: React.VFC<Props> = ({ workspace, wsDispatcher }) => {
 
   const rect = useElementRect(videoAreaRef);
 
-  const [, drop] = useDrop<
+  const [{ canDrop }, drop] = useDrop<
     WsVideoDroppable & { initialX: number },
     unknown,
-    unknown
+    { canDrop: boolean }
   >(
     () => ({
       accept: [DragItemType.Video, DragItemType.WorkspaceVideo],
       drop: (item, monitor) => {
         const x = monitor.getClientOffset()?.x;
         const w = rect?.left || 0;
-        console.log(x);
         if (!x) return;
 
         if (item.type === DragItemType.Video) {
@@ -122,14 +72,20 @@ export const WorkSpace: React.VFC<Props> = ({ workspace, wsDispatcher }) => {
           return; // TODO when not snap
         }
       },
+      canDrop: (item) => {
+        return true;
+      },
+      collect: (monitor) => ({
+        canDrop: monitor.canDrop(),
+      }),
     }),
     [workspace.videoItems, workspace.id]
   );
 
-  const onHover = (draggingIndex: number, overedIndex: number) => {
-    if (draggingIndex === overedIndex) return;
-    const dragging = videoItems[draggingIndex];
-    const target = videoItems[overedIndex];
+  const onHover = (draggingId: string, overedId: string) => {
+    if (draggingId === overedId) return;
+    const dragging = videoItems.find((it) => it.video.id === draggingId)!;
+    const target = videoItems.find((it) => it.video.id === overedId)!;
     const [i1, i2] = swapPosition(dragging, target);
     updateItems(i1, i2);
   };
@@ -169,11 +125,6 @@ export const WorkSpace: React.VFC<Props> = ({ workspace, wsDispatcher }) => {
         min={1}
         max={100}
       />
-      <div>
-        {ditems.map((it, i) => (
-          <WorkSpaceItem key={it.video.id} index={i} item={it} />
-        ))}
-      </div>
       <div className={styles.scroll} ref={areaRef}>
         <div className={styles.scrollLeft}>
           <div>scale</div>
@@ -181,13 +132,19 @@ export const WorkSpace: React.VFC<Props> = ({ workspace, wsDispatcher }) => {
         </div>
         <div className={styles.scrollInner}>
           <Scale duration={workspace.duration} pxPerSec={OneSecWidth} />
-          <div className={styles.videoArea} ref={ref}>
+          <div
+            className={classNames(
+              styles.videoArea,
+              canDrop ? styles.videoCanDrop : ''
+            )}
+            ref={ref}
+          >
             {videoItems.map((it, i) => (
               <WsDraggableVideo
-                key={i}
+                key={it.video.id}
                 index={i}
                 video={it.video}
-                color={getColor(i)}
+                color={it.color}
                 startTime={it.startTime}
                 duration={it.duration}
                 onItemHover={onHover}

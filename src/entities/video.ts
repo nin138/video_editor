@@ -17,14 +17,23 @@ abstract class VideoBase implements Video {
   private duration?: number | Promise<number>;
   readonly id = nanoid();
 
-  async getDuration() {
+  getDuration = (): Promise<number> | number => {
     if (this.duration) return this.duration;
-    const path = await getResource(this.getPath());
-    const ffmpeg = await getFFmpeg();
-    this.duration = ffmpeg.getDuration(path);
+    this.duration = new Promise(async (resolve) => {
+      const url = getResource(this.getUrl());
+      const el = document.createElement('video');
+      el.setAttribute('style', 'display: none');
+      el.setAttribute('src', await url);
+      document.body.append(el);
+      el.onloadedmetadata = () => {
+        this.duration = el.duration;
 
+        el.remove();
+        resolve(this.duration);
+      };
+    });
     return this.duration;
-  }
+  };
 
   abstract fileName(): string;
 

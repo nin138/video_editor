@@ -1,14 +1,16 @@
-import React, { useCallback, useEffect, useRef, useState } from 'react';
-import { Workspace, WsVideoItem } from '../../../entities/workspace';
-import { useCombinedRefs } from '../../../util';
+import React, { createRef, useEffect, useRef, useState } from 'react';
+import { Workspace } from '../../../entities/workspace';
 import { loop } from '../../../loop';
 import { WsVideoControl } from './WsVideoControl';
 import styles from './WsPlayer.module.css';
 
-const isCurrentVideo = (video: WsVideoItem, currentTime: number) => {
+const getTargetIndex = (workspace: Workspace, currentTime: number) => {
   return (
-    currentTime >= video.startTime &&
-    currentTime <= video.startTime + video.duration
+    workspace.videoItems.length -
+    1 -
+    [...workspace.videoItems]
+      .reverse()
+      .findIndex((it) => it.startTime <= currentTime)
   );
 };
 
@@ -23,70 +25,73 @@ const addLoop = (cb: () => void) => loop.add(LOOP_ID, cb);
 
 export const WsPlayer: React.VFC<Props> = ({ workspace }) => {
   const [currentTime, setCurrentTime] = useState(0);
-  const [playing, setPlaying] = useState(true);
+  const [playing, setPlaying] = useState(false);
 
-  const targetVideo = workspace.videoItems.find(isCurrentVideo);
-
-  const videoRef = useRef<HTMLVideoElement>(null);
-  const cbRef = useCallback<(node: HTMLVideoElement) => void>(
-    (node) => {
-      if (!node || !targetVideo) return;
-      console.log('cb', targetVideo);
-      node.currentTime = currentTime - targetVideo!.startTime;
-      if (playing) node.play();
-      else node.pause();
-      const listener = () => {
-        if (!node) {
-          rmLoop();
-          return;
-        }
-        setCurrentTime(
-          targetVideo!.startTime + parseFloat(node.currentTime.toFixed(2))
-        );
-      };
-      rmLoop();
-      // if(playing) addLoop(listener);
-      addLoop(listener);
-    },
-    [playing, targetVideo]
+  const videoRefs = useRef<React.RefObject<HTMLVideoElement>[]>([]);
+  videoRefs.current = workspace.videoItems.map(
+    (_, i) => videoRefs.current[i] ?? createRef()
   );
 
-  const ref = useCombinedRefs(cbRef, videoRef);
+  const targetIndex = getTargetIndex(workspace, currentTime);
+  const targetInfo = workspace.videoItems[targetIndex];
+  const targetVideo = videoRefs.current[targetIndex]?.current;
+
+  const onPlayClick = () => {
+    if (!playing) {
+      console.log(
+        currentTime,
+        workspace.duration,
+        currentTime >= workspace.duration
+      );
+      if (currentTime >= workspace.duration) {
+        console.log('c');
+        setCurrentTime(0);
+        videoRefs.current[0].current!.currentTime = 0;
+        videoRefs.current[0].current?.play();
+      } else {
+        targetVideo?.play();
+      }
+    } else targetVideo?.pause();
+    setPlaying(!playing);
+  };
 
   const onEnded = () => {
-    if (currentTime === workspace.duration) return;
-    rmLoop();
-    const next = targetVideo!.startTime + targetVideo!.duration;
-    console.log(next);
-    if (next === workspace.duration) {
-      console.log(next);
-      console.log('ended');
-      setPlaying(false);
+    let t = targetIndex;
+    if (targetIndex === workspace.videoItems.length - 1) {
+      if (currentTime !== targetInfo.startTime) {
+        setPlaying(false);
+        return;
+      }
+      t -= 1;
     }
-    setCurrentTime(next);
+    const nextTarget = videoRefs.current[t + 1].current;
+    if (!nextTarget) return;
+    nextTarget.currentTime = 0;
+    nextTarget.play();
+    setCurrentTime(workspace.videoItems[t + 1].startTime);
   };
 
   const onSeek = (value: number) => {
-    console.log('seek', targetVideo);
-    if (!videoRef.current || !targetVideo) return;
-    if (!isCurrentVideo(targetVideo, value)) {
-      rmLoop();
-      videoRef.current.pause();
-    }
+    if (!targetVideo) return;
+    const nextIndex = getTargetIndex(workspace, value);
+    const target = videoRefs.current[nextIndex].current;
+    target!.currentTime = value - workspace.videoItems[nextIndex].startTime;
+    if (playing && target!.paused) target?.play();
+    if (nextIndex !== targetIndex) targetVideo.pause();
+
     setCurrentTime(value as number);
-    videoRef.current.currentTime = value - targetVideo.startTime;
   };
 
-  const videoElements = workspace.videoItems.map((it) => {
-    const isCurrent = isCurrentVideo(it, currentTime);
+  const videoElements = workspace.videoItems.map((it, i) => {
+    const isCurrent = i === targetIndex;
     return (
       <video
-        key={it.video.id}
-        ref={isCurrent ? ref : undefined}
+        key={i}
+        ref={videoRefs.current[i]}
         muted
         className={styles.video}
         style={{
-          opacity: isCurrent ? 1 : 1,
+          opacity: isCurrent ? 1 : 0,
           width: 480,
           zIndex: isCurrent ? 1 : 0,
         }}
@@ -97,21 +102,25 @@ export const WsPlayer: React.VFC<Props> = ({ workspace }) => {
     );
   });
 
-  if (videoRef.current && playing) videoRef.current.play();
+  const everyTick = () => {
+    if (!targetVideo) return;
+    setCurrentTime(targetInfo.startTime + targetVideo.currentTime);
+  };
 
-  useEffect(() => () => rmLoop(), []);
+  useEffect(() => {
+    addLoop(everyTick);
+    return () => rmLoop();
+  }, [targetIndex, targetVideo]);
 
   return (
     <div>
       <div className={styles.videoArea}>{videoElements}</div>
-      <button onClick={() => setCurrentTime(0)}>r</button>
       <WsVideoControl
         workspace={workspace}
         playing={playing}
         currentTime={currentTime}
-        videoRef={videoRef}
         onSeek={onSeek}
-        setPlaying={setPlaying}
+        onPlayClick={onPlayClick}
       />
     </div>
   );

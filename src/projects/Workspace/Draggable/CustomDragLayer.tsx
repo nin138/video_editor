@@ -1,7 +1,8 @@
 import React, { CSSProperties } from 'react';
 import { XYCoord, useDragLayer } from 'react-dnd';
-import { DragItemType, WsVideoDroppable } from './workspaceDraggable';
-import { WsVideoView } from './Draggable/WsVideoView';
+import { DragItemType, WsVideoDroppable } from '../workspaceDraggable';
+import { WsVideoView } from './WsVideoView';
+import styles from './WsItem.module.css';
 
 const layerStyles: CSSProperties = {
   position: 'fixed',
@@ -60,15 +61,16 @@ export const CustomDragLayer: React.VFC<CustomDragLayerProps> = (props) => {
         return (
           <WsVideoView
             name={item.video.fileName()}
-            color={'#f00'}
+            color={item.color}
             width={item.duration * item.pxPerSec}
+            className={styles.alpha}
           />
         );
       case DragItemType.Video:
         return (
           <WsVideoView
             name={item.video.fileName()}
-            color={'#f00'}
+            color={'#777'}
             width={200}
           />
         );

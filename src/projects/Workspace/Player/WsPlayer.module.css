@@ -4,7 +4,7 @@
 }
 
 .video {
-  /*position: absolute;*/
+  position: absolute;
   z-index: 0;
 }
 

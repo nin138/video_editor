@@ -14,6 +14,7 @@ export interface WsVideoItem {
   startTime: number;
   duration: number;
   url: string;
+  color: string;
 }
 
 export const SelectedItemType = {
