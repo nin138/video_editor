@@ -3,11 +3,12 @@
   margin: 20px;
 }
 
-.videoArea {
+.line {
   height: 50px;
   position: relative;
   border: solid 2px transparent;
 }
+
 .videoCanDrop {
   border: solid 2px #333;
   background-size: auto auto;
@@ -76,4 +77,28 @@
   border-width: 8px 8px 0 8px;
   border-color: #007bff transparent transparent transparent;
   transform: translateX(-7px);
+}
+
+.modal {
+  width: 60%;
+  height: 60vh;
+  margin: 20vh auto;
+  padding: 20px;
+  display: flex;
+  align-items: center;
+  flex-direction: column;
+}
+
+.modalInputArea {
+  width: 300px;
+}
+
+.modalSliderWrap {
+  display: flex;
+  align-items: center;
+}
+
+.dataText {
+  width: 60px;
+  margin-right: 40px;
 }

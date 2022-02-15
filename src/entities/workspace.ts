@@ -1,11 +1,13 @@
 import { Video } from './video';
 import { nanoid } from 'nanoid';
+import { WsLayerItem } from '../context/workspace/WsLayerItem';
 
 export interface Workspace {
   type: typeof SelectedItemType.Workspace;
   id: string;
   name: string;
   videoItems: WsVideoItem[];
+  layers: WsLayerItem[];
   duration: number;
 }
 
@@ -28,5 +30,6 @@ export const getDefaultWorkspace = (i: number): Workspace => ({
   name: 'workspace' + (i + 1),
   id: nanoid(),
   videoItems: [],
+  layers: [],
   duration: 0,
 });

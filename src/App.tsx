@@ -7,19 +7,23 @@ import { Main } from './projects/Main';
 import { DndProvider } from 'react-dnd';
 import { HTML5Backend } from 'react-dnd-html5-backend';
 import { WorkspaceProvider } from './context/workspace/WorkspaceContext';
+import ThemeProvider from '@mui/material/styles/ThemeProvider';
+import { theme } from './theme';
 
 function App() {
   return (
     <div className="App">
       <AppEventProvider>
-        <ClipContextProvider>
-          <WorkspaceProvider>
-            <DndProvider backend={HTML5Backend}>
-              <FileZone />
-              <Main />
-            </DndProvider>
-          </WorkspaceProvider>
-        </ClipContextProvider>
+        <ThemeProvider theme={theme}>
+          <ClipContextProvider>
+            <WorkspaceProvider>
+              <DndProvider backend={HTML5Backend}>
+                <FileZone />
+                <Main />
+              </DndProvider>
+            </WorkspaceProvider>
+          </ClipContextProvider>
+        </ThemeProvider>
       </AppEventProvider>
     </div>
   );

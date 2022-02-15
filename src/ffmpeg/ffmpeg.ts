@@ -1,5 +1,9 @@
-import { createFFmpeg, fetchFile, LogCallback } from '@ffmpeg/ffmpeg';
+import { createFFmpeg, LogCallback } from '@ffmpeg/ffmpeg';
 import { nanoid } from 'nanoid';
+import { FS } from './fs';
+import { Video } from '../entities/video';
+import { getResource } from '../util';
+import { ChromaKeyData } from '../context/workspace/WsLayerItem';
 export const FILE_DIR = '/files/';
 export const CLIP_DIR = '/clips/';
 
@@ -12,26 +16,14 @@ class FFmpeg {
     log: false,
     corePath: 'https://unpkg.com/@ffmpeg/core@0.10.0/dist/ffmpeg-core.js',
     logger: this.defaultLogger,
+    progress: (progressParams) => console.log(progressParams),
   });
+
+  fs: FS = new FS(this.ffmpeg.FS);
 
   init(): Promise<void> {
     if (this.ffmpeg.isLoaded()) return Promise.resolve();
     return this.ffmpeg.load();
-  }
-
-  private fs(): (...args: any) => any {
-    return this.ffmpeg.FS;
-  }
-
-  async writeFile(file: File, fileName?: string): Promise<string> {
-    const path = FILE_DIR + (fileName || file.name);
-    this.ffmpeg.FS('writeFile', path, new Uint8Array(await file.arrayBuffer()));
-    return path;
-  }
-
-  async writeFileFromURL(url: string, fileName: string) {
-    const file = await fetchFile(url);
-    this.ffmpeg.FS('writeFile', FILE_DIR + fileName, file);
   }
 
   async getInfo(fileName: string) {
@@ -40,6 +32,9 @@ class FFmpeg {
     await r;
   }
 
+  /**
+   * @deprecated
+   */
   async getDuration(fileName: string): Promise<number> {
     return new Promise((resolve, reject) => {
       const logger: LogCallback = ({ type, message }) => {
@@ -64,66 +59,57 @@ class FFmpeg {
     });
   }
 
-  async clipVideo(
-    startSec: number,
-    endSec: number,
-    path: string,
-    outFileName: string
-  ) {
+  async clipVideo(startSec: number, endSec: number, path: string, outFileName: string) {
     console.log('------st---------');
     console.log(startSec, endSec);
     console.log('-----------e-------');
 
-    const fmt = (sec: number) =>
-      new Date(sec * 1000).toISOString().substring(11, 22);
+    const fmt = (sec: number) => new Date(sec * 1000).toISOString().substring(11, 22);
 
     const duration = fmt(endSec - startSec);
-    await this.ffmpeg.run(
-      '-ss',
-      fmt(startSec),
-      '-t',
-      duration,
-      '-i',
-      path,
-      '-c',
-      'copy',
-      CLIP_DIR + outFileName
-    );
+    await this.ffmpeg.run('-ss', fmt(startSec), '-t', duration, '-i', path, '-c', 'copy', CLIP_DIR + outFileName);
   }
 
   async concatVideos(outputFileName: string, ...paths: string[]) {
     const fileList = paths.map((it) => `file ${it}`).join('\n');
     const path = `/${nanoid()}.txt`;
     await this.ffmpeg.FS('writeFile', path, new TextEncoder().encode(fileList));
-    const result = this.ffmpeg.run(
-      '-f',
-      'concat',
-      '-safe',
-      '0',
-      '-i',
-      path,
-      '-c',
-      'copy',
-      CLIP_DIR + outputFileName
-    );
-    this.rmFile(path);
+    const result = this.ffmpeg.run('-f', 'concat', '-safe', '0', '-i', path, '-c', 'copy', CLIP_DIR + outputFileName);
+    this.fs.rmFile(path);
     return result;
   }
 
-  rmFile(fileName: string) {
-    return this.ffmpeg.FS('unlink', fileName);
-  }
+  async chromaKey(base: Video, overlay: Video, config: ChromaKeyData) {
+    const outFileName = 'composition_' + nanoid() + '.mp4';
 
-  async makeDir(name: string) {
-    return this.fs()('mkdir', name);
-  }
+    const filters = [
+      `[1:v]colorkey=0x${config.color}:${config.similarity}:${config.blend}[ckout]`,
+      `[ckout]setpts=PTS-STARTPTS+${config.startTime}/TB[ovr]`,
+      `[0:v][ovr]overlay=enable=gte(t\\,${config.startTime}):eof_action=pass[out]`,
+    ].join(';');
 
-  async readFile(fileName: string): Promise<Uint8Array> {
-    return this.ffmpeg.FS('readFile', fileName);
-  }
-
-  async readDir(path: string): Promise<string[]> {
-    return this.fs()('readdir', path);
+    const args = [
+      '-i',
+      await getResource(base.getPath()),
+      '-i',
+      await getResource(overlay.getPath()),
+      '-filter_complex',
+      `${filters}`,
+      '-map',
+      '[out]',
+      '-map',
+      '0:a?',
+      '-c:a',
+      'copy',
+      '-movflags',
+      '+faststart',
+      CLIP_DIR + outFileName,
+    ];
+    console.log('--------------');
+    console.log(args.join(' '));
+    console.log('--------------');
+    await this.ffmpeg.run(...args);
+    return outFileName;
   }
 }
 
@@ -131,7 +117,7 @@ const ffmpeg = new FFmpeg();
 
 const initialize = new Promise(async (resolve) => {
   await ffmpeg.init();
-  await Promise.all([ffmpeg.makeDir(FILE_DIR), ffmpeg.makeDir(CLIP_DIR)]);
+  await Promise.all([ffmpeg.fs.makeDir(FILE_DIR), ffmpeg.fs.makeDir(CLIP_DIR)]);
   resolve('');
 });
 
@@ -141,3 +127,4 @@ export const getFFmpeg = async (): Promise<FFmpeg> => {
 };
 
 (window as unknown as any).ffmpeg = ffmpeg;
+(window as unknown as any).fs = ffmpeg.fs;

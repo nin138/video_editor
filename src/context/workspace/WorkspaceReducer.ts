@@ -55,7 +55,11 @@ export const workspaceReducer: Reducer<WorkspaceState, WorkspaceAction> = (prevS
         videoItems: ws.videoItems.filter((it) => it.itemId !== action.itemId),
       }));
     }
-    default:
-      return prevState;
+    case WsActionTypes.AddChromaKeyOverlay: {
+      return updateWs(action.wsId, (ws) => ({
+        ...ws,
+        layers: [...ws.layers, action.item],
+      }));
+    }
   }
 };

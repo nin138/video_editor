@@ -1,12 +1,15 @@
 import { Workspace } from '../../entities/workspace';
 import { Video } from '../../entities/video';
 import { getResource } from '../../util';
+import { WsChromaKeyOverlay } from './WsLayerItem';
+import { nanoid } from 'nanoid';
 
 export const WsActionTypes = {
   AddWorkSpace: 'AddWorkSpace',
   UpdateWorkspace: 'UpdateWorkspace',
   AddVideoToWorkspace: 'AddVideoToWorkspace',
   RemoveVideoFromWs: 'RemoveVideoFromWs',
+  AddChromaKeyOverlay: 'AddChromaKeyOverlay',
 } as const;
 
 interface AddWorkSpaceAction {
@@ -33,7 +36,18 @@ interface RemoveVideoFromWs {
   itemId: string;
 }
 
-export type WorkspaceAction = AddWorkSpaceAction | UpdateWorkSpace | AddVideoToWorkspace | RemoveVideoFromWs;
+interface AddChromaKeyOverlay {
+  type: typeof WsActionTypes.AddChromaKeyOverlay;
+  wsId: string;
+  item: WsChromaKeyOverlay;
+}
+
+export type WorkspaceAction =
+  | AddWorkSpaceAction
+  | UpdateWorkSpace
+  | AddVideoToWorkspace
+  | RemoveVideoFromWs
+  | AddChromaKeyOverlay;
 
 export class WorkspaceActionDispatcher {
   constructor(private _dispatch: (action: WorkspaceAction) => void) {}
@@ -68,10 +82,18 @@ export class WorkspaceActionDispatcher {
   };
 
   removeVideoFromWs = (wsId: string, itemId: string) => {
-    return this.dispatch({
+    this.dispatch({
       type: WsActionTypes.RemoveVideoFromWs,
       wsId,
       itemId,
+    });
+  };
+
+  addChromaKeyOverlay = (wsId: string, item: Omit<WsChromaKeyOverlay, 'id'>) => {
+    this.dispatch({
+      type: WsActionTypes.AddChromaKeyOverlay,
+      wsId,
+      item: { ...item, id: nanoid() },
     });
   };
 }

@@ -68,7 +68,7 @@ export const VideoLine: React.VFC<Props> = ({ workspace, wsDispatcher, pxPerSec 
   const ref = useCombinedRefs<any>(drop, videoAreaRef);
 
   return (
-    <div className={classNames(styles.videoArea, canDrop ? styles.videoCanDrop : '')} ref={ref}>
+    <div className={classNames(styles.line, canDrop ? styles.videoCanDrop : '')} ref={ref}>
       {videoItems.map((it, i) => (
         <WsDraggableVideo
           key={it.itemId}

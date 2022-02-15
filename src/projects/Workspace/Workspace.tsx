@@ -14,6 +14,9 @@ import { WorkspaceActionDispatcher } from '../../context/workspace/WorkspaceActi
 import { WsPlayer } from './Player/WsPlayer';
 import { VideoLine } from './VideoLine';
 import { calcTransform } from './translate';
+import { NextLine } from './NextLine';
+import { WsLayers } from './WsLayers';
+import { encodeVideo } from '../../ffmpeg/edit';
 
 const SNAP = true;
 
@@ -35,20 +38,10 @@ export const WorkSpace: React.VFC<Props> = ({ workspace, wsDispatcher }) => {
   const [pxPerSec, setPxPerSec] = useState(30);
   const [concatenating, setConcatenating] = useState(false);
   const { addClip } = useContext(ClipContext);
-  const concatFiles = async () => {
+  const onEncodeVideoClick = async () => {
     setConcatenating(true);
-    const list = Array.from(videoItems);
-
-    const paths = await Promise.all(
-      list.sort((a, b) => a.startTime - b.startTime).map((it) => getResource(it.video.getPath()))
-    );
-
-    const ffmpeg = await getFFmpeg();
-
-    const output = getOutputFileName.next().value;
-    await ffmpeg.concatVideos(output, ...paths);
-
-    addClip(new ClipVideo(output));
+    const result = await encodeVideo(workspace);
+    addClip(result);
     setConcatenating(false);
   };
 
@@ -71,6 +64,8 @@ export const WorkSpace: React.VFC<Props> = ({ workspace, wsDispatcher }) => {
         <div className={styles.scrollInner}>
           <Scale duration={workspace.duration} pxPerSec={pxPerSec} />
           <VideoLine workspace={workspace} wsDispatcher={wsDispatcher} pxPerSec={pxPerSec} />
+          <WsLayers workspace={workspace} wsDispatcher={wsDispatcher} />
+          <NextLine wsId={workspace.id} wsDispatcher={wsDispatcher} />
           <div className={styles.timeIndicator} ref={timeIndicator}>
             <div className={styles.triangle} />
           </div>
@@ -79,7 +74,7 @@ export const WorkSpace: React.VFC<Props> = ({ workspace, wsDispatcher }) => {
       </div>
 
       {!concatenating ? (
-        <button disabled={videoItems.length < 2} onClick={concatFiles}>
+        <button disabled={videoItems.length < 1} onClick={onEncodeVideoClick}>
           処理開始
         </button>
       ) : (

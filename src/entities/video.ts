@@ -58,7 +58,7 @@ export class LocalVideo extends VideoBase {
     if (this.path) return this.path;
     this.path = new Promise<string>(async (resolve) => {
       const ffmpeg = await getFFmpeg();
-      const path = await ffmpeg.writeFile(this.file, this.id + '.mp4');
+      const path = await ffmpeg.fs.writeFile(this.file, this.id + '.mp4');
       this.path = path;
       resolve(path);
     });
@@ -95,7 +95,7 @@ export class ClipVideo extends VideoBase {
     if (this.url) return this.url;
     this.url = new Promise<string>(async (resolve) => {
       const ffmpeg = await getFFmpeg();
-      const data = await ffmpeg.readFile(await this.getPath());
+      const data = await ffmpeg.fs.readFile(await this.getPath());
       const url = URL.createObjectURL(new Blob([data.buffer]));
       this.url = url;
       resolve(url);
