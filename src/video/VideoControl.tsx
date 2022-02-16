@@ -1,23 +1,10 @@
 import styles from './VideoControl.module.css';
-import React, {
-  MutableRefObject,
-  ReactEventHandler,
-  useContext,
-  useEffect,
-  useState,
-  Suspense,
-} from 'react';
+import React, { MutableRefObject, ReactEventHandler, useContext, useEffect, useState, Suspense } from 'react';
 import { getFFmpeg } from '../ffmpeg/ffmpeg';
 import { ToggleButton } from '../atoms/Button/ToggleButton';
 import { Option } from '../atoms/Option';
 import { TimeSlider } from './TimeSlider/TimeSlider';
-import {
-  CutIcon,
-  LabelLeft,
-  LabelRight,
-  PlaySelectedRangeIcon,
-  RepeatIcon,
-} from '../atoms/Icons';
+import { CutIcon, LabelLeft, LabelRight, PlaySelectedRangeIcon, RepeatIcon } from '../atoms/Icons';
 import { IconButton } from '../atoms/Button/IconButton';
 import { PlayStopButton } from '../atoms/Button/PlayStopButton';
 import { RangeData } from '../rangeData';
@@ -50,8 +37,7 @@ export const VideoControl: React.FC<Props> = ({ selectedVideo }) => {
 
   const { addClip } = useContext(ClipContext);
 
-  const videoRef: MutableRefObject<HTMLVideoElement | null> =
-    React.useRef(null);
+  const videoRef: MutableRefObject<HTMLVideoElement | null> = React.useRef(null);
 
   const onReady = (ref: HTMLVideoElement) => {
     console.log('ready');
@@ -76,8 +62,7 @@ export const VideoControl: React.FC<Props> = ({ selectedVideo }) => {
     setSelectedRange(selectedRange.update(values as [number, number]));
   };
 
-  const videoRef2: MutableRefObject<HTMLVideoElement | null> =
-    React.useRef(null);
+  const videoRef2: MutableRefObject<HTMLVideoElement | null> = React.useRef(null);
   const onSliceButtonClicked = () => {
     if (clipping) return;
     setClipping(true);
@@ -87,12 +72,7 @@ export const VideoControl: React.FC<Props> = ({ selectedVideo }) => {
 
         const input = await selectedVideo!.getPath();
 
-        await it.clipVideo(
-          selectedRange.start(),
-          selectedRange.end(),
-          input,
-          outFileName
-        );
+        await it.clipVideo(selectedRange.start(), selectedRange.end(), input, outFileName);
         dispatch(AppEvents.ReadFile.message);
 
         setClipping(false);
@@ -117,11 +97,7 @@ export const VideoControl: React.FC<Props> = ({ selectedVideo }) => {
 
   const onPlay = () => {
     setPlaying(true);
-    if (
-      playOnlySelectedRange &&
-      videoRef.current &&
-      videoRef.current.currentTime > selectedRange.end()
-    ) {
+    if (playOnlySelectedRange && videoRef.current && videoRef.current.currentTime > selectedRange.end()) {
       videoRef.current.currentTime = selectedRange.start();
     }
   };
@@ -135,8 +111,7 @@ export const VideoControl: React.FC<Props> = ({ selectedVideo }) => {
       setCurrentTime(videoRef.current.currentTime);
       if (!playOnlySelectedRange) return;
       if (selectedRange.duration() === 0) return;
-      if (videoRef.current.currentTime < selectedRange.start())
-        videoRef.current.currentTime = selectedRange.start();
+      if (videoRef.current.currentTime < selectedRange.start()) videoRef.current.currentTime = selectedRange.start();
       if (videoRef.current.currentTime > selectedRange.end()) {
         if (repeat) videoRef.current.currentTime = selectedRange.start();
         else videoRef.current.pause();
@@ -175,11 +150,7 @@ export const VideoControl: React.FC<Props> = ({ selectedVideo }) => {
         />
       </Option>
       <div className={styles.commandArea}>
-        <ToggleButton
-          onClick={setRepeat}
-          isActive={repeat}
-          popOver={'リピート'}
-        >
+        <ToggleButton onClick={setRepeat} isActive={repeat} popOver={'リピート'}>
           <RepeatIcon />
         </ToggleButton>
         <ToggleButton
@@ -190,23 +161,13 @@ export const VideoControl: React.FC<Props> = ({ selectedVideo }) => {
           <PlaySelectedRangeIcon />
         </ToggleButton>
         <IconButton
-          onClick={() =>
-            onRangeChanged([
-              videoRef.current?.currentTime || 0,
-              selectedRange.data[1],
-            ])
-          }
+          onClick={() => onRangeChanged([videoRef.current?.currentTime || 0, selectedRange.data[1]])}
           popOver={'右向きラベルを現在の再生位置に移動します'}
         >
           <LabelLeft />
         </IconButton>
         <IconButton
-          onClick={() =>
-            onRangeChanged([
-              selectedRange.data[0],
-              videoRef.current?.currentTime || 0,
-            ])
-          }
+          onClick={() => onRangeChanged([selectedRange.data[0], videoRef.current?.currentTime || 0])}
           popOver={'左向きラベルを現在の再生位置に移動します'}
         >
           <LabelRight />
@@ -220,11 +181,7 @@ export const VideoControl: React.FC<Props> = ({ selectedVideo }) => {
           }}
         />
 
-        <IconButton
-          disabled={clipping}
-          onClick={onSliceButtonClicked}
-          popOver={'ラベルの間の範囲を切り抜きます'}
-        >
+        <IconButton disabled={clipping} onClick={onSliceButtonClicked} popOver={'ラベルの間の範囲を切り抜きます'}>
           {clipping ? <CircularProgress size={24} /> : <CutIcon />}
         </IconButton>
       </div>

@@ -8,12 +8,7 @@ interface Props {
   fileName: string;
 }
 
-export const FileView: React.FC<Props> = ({
-  onClick,
-  selected,
-  fileName,
-  children,
-}) => {
+export const FileView: React.FC<Props> = ({ onClick, selected, fileName, children }) => {
   return (
     <div className={classNames(styles.file, selected ? styles.selected : '')}>
       <div onClick={onClick} className={styles.fileName}>

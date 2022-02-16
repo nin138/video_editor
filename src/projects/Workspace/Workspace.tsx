@@ -6,8 +6,6 @@ import { classNames, getResource } from '../../util';
 import { useElementRect } from '../../hooks/useElementRect';
 import { CustomDragLayer } from './Draggable/CustomDragLayer';
 import { Workspace } from '../../entities/workspace';
-import { getFFmpeg } from '../../ffmpeg/ffmpeg';
-import { getOutputFileName } from '../../ffmpeg/getFileName';
 import { ClipContext } from '../../context/ClipsContext';
 import { Slider } from '@mui/material';
 import { WorkspaceActionDispatcher } from '../../context/workspace/WorkspaceAction';
@@ -17,6 +15,7 @@ import { calcTransform } from './translate';
 import { NextLine } from './NextLine';
 import { WsLayers } from './WsLayers';
 import { encodeVideo } from '../../ffmpeg/edit';
+import { ScrollContainer } from '../../atoms/ScrollContainer';
 
 const SNAP = true;
 
@@ -56,7 +55,7 @@ export const WorkSpace: React.VFC<Props> = ({ workspace, wsDispatcher }) => {
     <div className={styles.wrap}>
       <WsPlayer workspace={workspace} onTimeUpdate={onTimeUpdate} />
       <Slider onChange={(_, value) => setPxPerSec(value as number)} value={pxPerSec} min={1} max={100} />
-      <div className={classNames(styles.scroll, '.scroll')} ref={areaRef}>
+      <ScrollContainer className={classNames(styles.scroll, '.scroll')} areaRef={areaRef}>
         <div className={styles.scrollLeft}>
           <div>scale</div>
           <div>video</div>
@@ -64,14 +63,14 @@ export const WorkSpace: React.VFC<Props> = ({ workspace, wsDispatcher }) => {
         <div className={styles.scrollInner}>
           <Scale duration={workspace.duration} pxPerSec={pxPerSec} />
           <VideoLine workspace={workspace} wsDispatcher={wsDispatcher} pxPerSec={pxPerSec} />
-          <WsLayers workspace={workspace} wsDispatcher={wsDispatcher} />
+          <WsLayers workspace={workspace} wsDispatcher={wsDispatcher} pxPerSec={pxPerSec} />
           <NextLine wsId={workspace.id} wsDispatcher={wsDispatcher} />
           <div className={styles.timeIndicator} ref={timeIndicator}>
             <div className={styles.triangle} />
           </div>
           <CustomDragLayer />
         </div>
-      </div>
+      </ScrollContainer>
 
       {!concatenating ? (
         <button disabled={videoItems.length < 1} onClick={onEncodeVideoClick}>

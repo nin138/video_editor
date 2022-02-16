@@ -55,10 +55,22 @@ export const workspaceReducer: Reducer<WorkspaceState, WorkspaceAction> = (prevS
         videoItems: ws.videoItems.filter((it) => it.itemId !== action.itemId),
       }));
     }
-    case WsActionTypes.AddChromaKeyOverlay: {
+    case WsActionTypes.AddOverlayVideo: {
       return updateWs(action.wsId, (ws) => ({
         ...ws,
         layers: [...ws.layers, action.item],
+      }));
+    }
+    case WsActionTypes.UpdateOverlay: {
+      return updateWs(action.wsId, (ws) => ({
+        ...ws,
+        layers: ws.layers.map((it) => (it.id === action.item.id ? { ...it, ...action.item } : it)),
+      }));
+    }
+    case WsActionTypes.RemoveLayer: {
+      return updateWs(action.wsId, (ws) => ({
+        ...ws,
+        layers: ws.layers.filter((it) => action.itemId !== it.id),
       }));
     }
   }

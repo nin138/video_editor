@@ -9,9 +9,7 @@ interface Props {
   onDrop: (files: File[]) => void;
 }
 
-const validator: <T extends File>(file: T) => FileError | FileError[] | null = (
-  file
-) => {
+const validator: <T extends File>(file: T) => FileError | FileError[] | null = (file) => {
   if (file.type !== 'video/mp4') {
     return {
       code: ErrorCode.FileInvalidType,
@@ -34,12 +32,7 @@ export const Dropzone: React.FC<Props> = ({ onDrop, children }) => {
     onDropRejected: (fileRejections) => {
       console.log(fileRejections);
       window.alert(
-        fileRejections
-          .map(
-            (it) =>
-              it.file.name + ':  ' + it.errors.map((it) => it.message).join(' ')
-          )
-          .join('\n')
+        fileRejections.map((it) => it.file.name + ':  ' + it.errors.map((it) => it.message).join(' ')).join('\n')
       );
     },
   });
@@ -51,11 +44,7 @@ export const Dropzone: React.FC<Props> = ({ onDrop, children }) => {
       <Option display={isDragActive}>
         <div className={styles.hover} />
       </Option>
-      <div
-        className={styles.head}
-        onClick={onClick}
-        style={{ cursor: 'pointer' }}
-      >
+      <div className={styles.head} onClick={onClick} style={{ cursor: 'pointer' }}>
         {isDragActive ? 'ここにドロップしてね' : 'ファイルを選択'}
         <FolderIcon className={styles.folderIcon} />
       </div>

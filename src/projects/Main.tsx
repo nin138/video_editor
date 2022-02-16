@@ -12,9 +12,7 @@ export const Main: React.FC = () => {
       case SelectedItemType.Video:
         return <VideoControl selectedVideo={selectedItem.item} />;
       case SelectedItemType.Workspace: {
-        return (
-          <WorkSpace workspace={selectedItem.item} wsDispatcher={dispatcher} />
-        );
+        return <WorkSpace workspace={selectedItem.item} wsDispatcher={dispatcher} />;
       }
     }
   };

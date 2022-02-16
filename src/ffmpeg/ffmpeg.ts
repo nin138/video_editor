@@ -79,14 +79,8 @@ class FFmpeg {
     return result;
   }
 
-  async chromaKey(base: Video, overlay: Video, config: ChromaKeyData) {
+  private async composition(base: Video, overlay: Video, filters: string[]) {
     const outFileName = 'composition_' + nanoid() + '.mp4';
-
-    const filters = [
-      `[1:v]colorkey=0x${config.color}:${config.similarity}:${config.blend}[ckout]`,
-      `[ckout]setpts=PTS-STARTPTS+${config.startTime}/TB[ovr]`,
-      `[0:v][ovr]overlay=enable=gte(t\\,${config.startTime}):eof_action=pass[out]`,
-    ].join(';');
 
     const args = [
       '-i',
@@ -94,7 +88,7 @@ class FFmpeg {
       '-i',
       await getResource(overlay.getPath()),
       '-filter_complex',
-      `${filters}`,
+      `${filters.join(';')}`,
       '-map',
       '[out]',
       '-map',
@@ -105,11 +99,26 @@ class FFmpeg {
       '+faststart',
       CLIP_DIR + outFileName,
     ];
-    console.log('--------------');
-    console.log(args.join(' '));
-    console.log('--------------');
+
     await this.ffmpeg.run(...args);
     return outFileName;
+  }
+
+  async overlay(base: Video, overlay: Video, startTime: number = 0) {
+    const filters = [
+      `[1:v]setpts=PTS-STARTPTS+${startTime}/TB[ovr]`,
+      `[0:v][ovr]overlay=enable=gte(t\\,${startTime}):eof_action=pass[out]`,
+    ];
+    return this.composition(base, overlay, filters);
+  }
+
+  async chromaKey(base: Video, overlay: Video, chroma: ChromaKeyData, startTime: number = 0) {
+    const filters = [
+      `[1:v]colorkey=0x${chroma.color}:${chroma.similarity}:${chroma.blend}[ckout]`,
+      `[ckout]setpts=PTS-STARTPTS+${startTime}/TB[ovr]`,
+      `[0:v][ovr]overlay=enable=gte(t\\,${startTime}):eof_action=pass[out]`,
+    ];
+    return this.composition(base, overlay, filters);
   }
 }
 

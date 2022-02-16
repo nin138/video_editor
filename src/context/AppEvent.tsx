@@ -34,12 +34,7 @@ export const AppEventProvider: React.FC = ({ children }) => {
   const [events, setEvents] = useState<AppEvent[]>([]);
   const context: Context = {
     events,
-    dispatch: (message) =>
-      setEvents((events) => [...events, { message, time: new Date() }]),
+    dispatch: (message) => setEvents((events) => [...events, { message, time: new Date() }]),
   };
-  return (
-    <AppEventContext.Provider value={context}>
-      {children}
-    </AppEventContext.Provider>
-  );
+  return <AppEventContext.Provider value={context}>{children}</AppEventContext.Provider>;
 };

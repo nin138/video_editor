@@ -13,11 +13,7 @@ export const ThumbLabel = ({
 }) => {
   const [labelValue, style] = useThumbOverlap(rangeRef, values, index);
   return (
-    <div
-      data-label={index}
-      style={style as React.CSSProperties}
-      className={styles.label}
-    >
+    <div data-label={index} style={style as React.CSSProperties} className={styles.label}>
       {labelValue}
     </div>
   );

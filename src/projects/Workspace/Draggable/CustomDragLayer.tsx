@@ -14,10 +14,7 @@ const layerStyles: CSSProperties = {
   height: '100%',
 };
 
-function getItemStyles(
-  initialOffset: XYCoord | null,
-  currentOffset: XYCoord | null
-) {
+function getItemStyles(initialOffset: XYCoord | null, currentOffset: XYCoord | null) {
   if (!initialOffset || !currentOffset) {
     return {
       display: 'none',
@@ -43,13 +40,12 @@ interface CollectedProps {
 }
 
 export const CustomDragLayer: React.VFC<CustomDragLayerProps> = (props) => {
-  const { isDragging, item, initialOffset, currentOffset } =
-    useDragLayer<CollectedProps>((monitor) => ({
-      item: monitor.getItem(),
-      initialOffset: monitor.getInitialSourceClientOffset(),
-      currentOffset: monitor.getSourceClientOffset(),
-      isDragging: monitor.isDragging(),
-    }));
+  const { isDragging, item, initialOffset, currentOffset } = useDragLayer<CollectedProps>((monitor) => ({
+    item: monitor.getItem(),
+    initialOffset: monitor.getInitialSourceClientOffset(),
+    currentOffset: monitor.getSourceClientOffset(),
+    isDragging: monitor.isDragging(),
+  }));
 
   if (!isDragging) {
     return null;
@@ -67,22 +63,14 @@ export const CustomDragLayer: React.VFC<CustomDragLayerProps> = (props) => {
           />
         );
       case DragItemType.Video:
-        return (
-          <WsVideoView
-            name={item.video.fileName()}
-            color={'#777'}
-            width={200}
-          />
-        );
+        return <WsVideoView name={item.video.fileName()} color={'#777'} width={200} />;
     }
     return 'not impl';
   };
 
   return (
     <div style={layerStyles}>
-      <div style={getItemStyles(initialOffset, currentOffset)}>
-        {renderItem()}
-      </div>
+      <div style={getItemStyles(initialOffset, currentOffset)}>{renderItem()}</div>
     </div>
   );
 };

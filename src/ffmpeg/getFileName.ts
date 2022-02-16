@@ -40,5 +40,4 @@ function* makeOutputFileName() {
   return '';
 }
 
-export const getOutputFileName: Generator<string, string, string> =
-  makeOutputFileName();
+export const getOutputFileName: Generator<string, string, string> = makeOutputFileName();

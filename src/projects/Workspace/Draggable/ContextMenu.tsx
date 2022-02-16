@@ -63,11 +63,7 @@ export const ContextMenu: React.VFC<Props> = ({ children, id, menu }) => {
         TransitionComponent={Fade}
       >
         {menu.map((it, i) => (
-          <MenuItem
-            key={i}
-            className={styles.menuItem}
-            onClick={withHandleClose(it.onClick)}
-          >
+          <MenuItem key={i} className={styles.menuItem} onClick={withHandleClose(it.onClick)}>
             {it.title}
           </MenuItem>
         ))}

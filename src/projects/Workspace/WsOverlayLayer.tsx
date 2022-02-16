@@ -1,15 +1,20 @@
-import React, { useRef, useState } from 'react';
+import React from 'react';
 import { useDrop } from 'react-dnd';
 import { DragItemType, WsVideoDroppable } from './workspaceDraggable';
 import styles from './Workspace.module.css';
 import { classNames } from '../../util';
-import { WsChromaKeyOverlay } from '../../context/workspace/WsLayerItem';
+import { WsOverlay } from '../../context/workspace/WsLayerItem';
+import { WsOverlayVideo } from './Draggable/WsOverlayVideo';
+import { WorkspaceActionDispatcher } from '../../context/workspace/WorkspaceAction';
 
 interface Props {
-  item: WsChromaKeyOverlay;
+  wsId: string;
+  item: WsOverlay;
+  pxPerSec: number;
+  wsDispatcher: WorkspaceActionDispatcher;
 }
 
-export const WsChromaKeyLayer: React.VFC<Props> = ({ item }) => {
+export const WsOverlayLayer: React.VFC<Props> = ({ item, pxPerSec, wsId, wsDispatcher }) => {
   const [{ canDrop }, drop] = useDrop<WsVideoDroppable & { initialX: number }, unknown, { canDrop: boolean }>(() => ({
     accept: [DragItemType.Video], // TODO
     drop: (item, monitor) => {},
@@ -23,7 +28,7 @@ export const WsChromaKeyLayer: React.VFC<Props> = ({ item }) => {
 
   return (
     <div className={classNames(styles.line, canDrop ? styles.videoCanDrop : '')} ref={drop}>
-      <div>{item.video.fileName()}</div>
+      <WsOverlayVideo item={item} pxPerSec={pxPerSec} wsId={wsId} wsDispatcher={wsDispatcher} />
     </div>
   );
 };

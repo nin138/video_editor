@@ -13,12 +13,7 @@ interface Props {
   popOver?: string;
 }
 
-export const ToggleButton: React.FC<Props> = ({
-  children,
-  onClick,
-  isActive,
-  popOver,
-}) => {
+export const ToggleButton: React.FC<Props> = ({ children, onClick, isActive, popOver }) => {
   const [anchorEl, setAnchorEl] = React.useState<HTMLElement | null>(null);
 
   const handlePopoverOpen = (event: React.MouseEvent<HTMLElement>) => {
@@ -36,14 +31,7 @@ export const ToggleButton: React.FC<Props> = ({
       TouchRippleProps={{ classes: { ripple: styles.ripple } }}
       onClick={() => onClick(!isActive)}
     >
-      <div
-        className={classNames(
-          styles.button,
-          isActive ? styles.toggleActive : ''
-        )}
-      >
-        {children}
-      </div>
+      <div className={classNames(styles.button, isActive ? styles.toggleActive : '')}>{children}</div>
       <Option display={popOver !== undefined}>
         <Popover
           id="mouse-over-popover"

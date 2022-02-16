@@ -24,13 +24,7 @@ export const WsVideoControl: React.VFC<WsVideoViewProps> = ({
 
   return (
     <div>
-      {workspace.duration !== 0 ? (
-        <Slider
-          max={workspace.duration}
-          onChange={onSeek}
-          value={currentTime}
-        />
-      ) : null}
+      {workspace.duration !== 0 ? <Slider max={workspace.duration} onChange={onSeek} value={currentTime} /> : null}
       <div className={styles.controls}>
         <div className={styles.time}>
           {formatSec(Math.floor(currentTime))}

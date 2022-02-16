@@ -11,12 +11,7 @@ interface Props {
   max: number;
 }
 
-export const SliderTrack: React.FC<Props> = ({
-  value,
-  max,
-  props,
-  children,
-}) => (
+export const SliderTrack: React.FC<Props> = ({ value, max, props, children }) => (
   <div
     onMouseDown={props.onMouseDown}
     onTouchStart={props.onTouchStart}

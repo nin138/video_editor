@@ -5,10 +5,10 @@ import { IconButton } from '../../atoms/Button/IconButton';
 import { AddIcon } from '../../atoms/Icons';
 import { WorkspaceName } from './WorkspaceName';
 import { WorkspaceContext } from '../../context/workspace/WorkspaceContext';
+import { ScrollContainer } from '../../atoms/ScrollContainer';
 
 export const Workspaces: React.FC = () => {
-  const { workspaces, selectedItem, setSelectedItem, dispatcher } =
-    useContext(WorkspaceContext);
+  const { workspaces, selectedItem, setSelectedItem, dispatcher } = useContext(WorkspaceContext);
 
   return (
     <div>
@@ -22,7 +22,7 @@ export const Workspaces: React.FC = () => {
           <AddIcon />
         </IconButton>
       </div>
-      <div className={classNames(styles.scroll, styles.workspace)}>
+      <ScrollContainer className={classNames(styles.scroll, styles.workspace)}>
         {workspaces.map((it, i) => (
           <WorkspaceName
             key={i}
@@ -31,7 +31,7 @@ export const Workspaces: React.FC = () => {
             selected={selectedItem.item.id === it.id}
           />
         ))}
-      </div>
+      </ScrollContainer>
     </div>
   );
 };

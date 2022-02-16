@@ -11,13 +11,7 @@ interface Props {
   popOver: string;
 }
 
-export const IconButton: React.FC<Props> = ({
-  children,
-  onClick,
-  disabled,
-  className,
-  popOver,
-}) => {
+export const IconButton: React.FC<Props> = ({ children, onClick, disabled, className, popOver }) => {
   const [anchorEl, setAnchorEl] = React.useState<HTMLElement | null>(null);
 
   const handlePopoverOpen = (event: React.MouseEvent<HTMLElement>) => {

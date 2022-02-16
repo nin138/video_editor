@@ -18,16 +18,10 @@ interface Props {
 }
 
 export const LabelLeft: React.FC<Props> = ({ style, className }) => (
-  <LabelIcon
-    style={style}
-    className={classNames(styles.labelIcon, className)}
-  />
+  <LabelIcon style={style} className={classNames(styles.labelIcon, className)} />
 );
 export const LabelRight: React.FC<Props> = ({ style, className }) => (
-  <LabelIcon
-    style={style}
-    className={classNames(styles.labelIcon, styles.rotate180, className)}
-  />
+  <LabelIcon style={style} className={classNames(styles.labelIcon, styles.rotate180, className)} />
 );
 
 export const PlayStopIcon: React.FC<{ playing: boolean }> = ({ playing }) => {

@@ -27,19 +27,14 @@ const Thumb: React.FC<ThumbProps> = ({ props, values, range, index }) => {
     <div {...props} style={props.style} className={styles.thumb}>
       <ThumbLabel rangeRef={range} values={values} index={index} />
       <IconButton className={styles.thumbIcon}>
-        {index === 0 ? (
-          <LabelLeft className={styles.thumbIcon} />
-        ) : (
-          <LabelRight className={styles.thumbIcon} />
-        )}
+        {index === 0 ? <LabelLeft className={styles.thumbIcon} /> : <LabelRight className={styles.thumbIcon} />}
       </IconButton>
     </div>
   );
 };
 
 export const Range: React.FC<Props> = ({ max, onChange, values }) => {
-  const rangeRef: React.MutableRefObject<RRange | null> =
-    React.useRef<RRange>(null);
+  const rangeRef: React.MutableRefObject<RRange | null> = React.useRef<RRange>(null);
 
   return (
     <div
@@ -58,21 +53,9 @@ export const Range: React.FC<Props> = ({ max, onChange, values }) => {
         max={max}
         onChange={onChange as (values: number[]) => void}
         renderTrack={({ props, children }) => (
-          <RangeTrack
-            values={values}
-            max={max}
-            props={props}
-            children={children}
-          />
+          <RangeTrack values={values} max={max} props={props} children={children} />
         )}
-        renderThumb={(props) => (
-          <Thumb
-            key={props.props.key}
-            {...props}
-            range={rangeRef.current!}
-            values={values}
-          />
-        )}
+        renderThumb={(props) => <Thumb key={props.props.key} {...props} range={rangeRef.current!} values={values} />}
       />
     </div>
   );

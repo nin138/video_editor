@@ -9,17 +9,9 @@ export interface WsVideoViewProps {
   className?: string;
 }
 
-export const WsVideoView: React.VFC<WsVideoViewProps> = ({
-  name,
-  color,
-  width,
-  className,
-}) => {
+export const WsVideoView: React.VFC<WsVideoViewProps> = ({ name, color, width, className }) => {
   return (
-    <div
-      className={classNames(styles.wsVideoView, className)}
-      style={{ background: color, width: width }}
-    >
+    <div className={classNames(styles.wsVideoView, className)} style={{ background: color, width: width }}>
       {name}
     </div>
   );

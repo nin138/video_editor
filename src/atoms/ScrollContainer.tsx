@@ -1,32 +1,16 @@
-import Base, { ScrollContainerProps } from 'react-indiana-drag-scroll';
 import React from 'react';
+import { classNames } from '../util';
+import styles from './Std.module.css';
 
-interface Props extends ScrollContainerProps {
-  targetElementClass: string;
+interface Props {
+  className?: string;
+  areaRef?: React.RefObject<HTMLDivElement>;
 }
 
-class ScrollContainer2 extends Base {
-  private targetElementClass: string;
-  constructor(props: Props) {
-    super(props);
-    this.targetElementClass = props.targetElementClass;
-  }
-
-  isDraggable(target: HTMLElement) {
-    const ignoreElements = this.props.ignoreElements;
-    if (
-      this.targetElementClass &&
-      !target.classList.contains(this.targetElementClass)
-    )
-      return false;
-
-    if (ignoreElements) {
-      const closest = target.closest(ignoreElements);
-      return closest === null || closest.contains(this.getElement());
-    } else {
-      return true;
-    }
-  }
-}
-
-export const ScrollContainer = ScrollContainer2 as unknown as React.FC<Props>;
+export const ScrollContainer: React.FC<Props> = ({ children, className, areaRef }) => {
+  return (
+    <div ref={areaRef} className={classNames(styles.scroll, className)}>
+      {children}
+    </div>
+  );
+};

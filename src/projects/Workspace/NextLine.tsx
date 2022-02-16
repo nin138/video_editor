@@ -5,16 +5,8 @@ import styles from './Workspace.module.css';
 import { classNames } from '../../util';
 import { useElementRect } from '../../hooks/useElementRect';
 import { WorkspaceActionDispatcher } from '../../context/workspace/WorkspaceAction';
-import { ChromaKeyData } from '../../context/workspace/WsLayerItem';
-import { ChromaKeyModal } from './Modal/ChromaVideoModal';
+import { OverlayVideoModal } from './Modal/OverlayVideoModal';
 import { Video } from '../../entities/video';
-
-const def: ChromaKeyData = {
-  color: '#fff',
-  similarity: 0.01,
-  blend: 0,
-  startTime: 0,
-};
 
 interface Props {
   wsId: string;
@@ -49,10 +41,16 @@ export const NextLine: React.VFC<Props> = ({ wsId, wsDispatcher }) => {
   return (
     <div className={classNames(styles.line, canDrop ? styles.videoCanDrop : '')} ref={drop}>
       {!!droppedVideo ? (
-        <ChromaKeyModal
+        <OverlayVideoModal
+          onSave={(video, chroma, onClose) => {
+            wsDispatcher.addOverlayVideo(wsId, {
+              chroma,
+              video,
+              startTime: 0,
+            });
+            onClose();
+          }}
           video={droppedVideo}
-          wsId={wsId}
-          wsDispatcher={wsDispatcher}
           onClose={() => setDroppedVideo(null)}
         />
       ) : null}

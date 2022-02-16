@@ -1,10 +1,6 @@
 import React, { useContext, useState } from 'react';
 import { Video } from '../entities/video';
-import {
-  getDefaultWorkspace,
-  SelectedItemType,
-  Workspace,
-} from '../entities/workspace';
+import { getDefaultWorkspace, SelectedItemType, Workspace } from '../entities/workspace';
 import { WorkspaceContext } from './workspace/WorkspaceContext';
 
 interface VideoContext {
@@ -46,9 +42,5 @@ export const SelectedItemContextProvider: React.FC = ({ children }) => {
     type: isWs ? SelectedItemType.Workspace : SelectedItemType.Video,
   } as Context;
 
-  return (
-    <SelectedItemContext.Provider value={context}>
-      {children}
-    </SelectedItemContext.Provider>
-  );
+  return <SelectedItemContext.Provider value={context}>{children}</SelectedItemContext.Provider>;
 };

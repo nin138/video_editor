@@ -11,12 +11,7 @@ interface Props {
   max: number;
 }
 
-export const RangeTrack: React.FC<Props> = ({
-  values,
-  max,
-  props,
-  children,
-}) => (
+export const RangeTrack: React.FC<Props> = ({ values, max, props, children }) => (
   <div style={{ ...props.style }} className={styles.track}>
     <div
       onMouseDown={props.onMouseDown}

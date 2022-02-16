@@ -4,9 +4,7 @@ export const classNames = (...className: (string | undefined)[]) => {
   return className.filter((it) => !!it).join(' ');
 };
 
-export const useCombinedRefs = <T extends any>(
-  ...refs: Array<Ref<T>>
-): Ref<T> =>
+export const useCombinedRefs = <T extends any>(...refs: Array<Ref<T>>): Ref<T> =>
   useCallback(
     (element: T) =>
       refs.forEach((ref) => {
@@ -35,4 +33,9 @@ export const formatSec = (sec: number) => {
   const seconds = sec % 60;
 
   return `${minutes}:${seconds.toString().padStart(2, '0')}`;
+};
+
+const hexcolor = /^#?([0-9A-F]{3}|[0-9A-F]{6})$/i;
+export const isHexColor = (color: string): boolean => {
+  return hexcolor.test(color);
 };

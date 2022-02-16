@@ -17,7 +17,5 @@ export const ClipContextProvider: React.FC = ({ children }) => {
     clips,
     addClip: (clip) => setClips((prev) => [...prev, clip]),
   };
-  return (
-    <ClipContext.Provider value={context}>{children}</ClipContext.Provider>
-  );
+  return <ClipContext.Provider value={context}>{children}</ClipContext.Provider>;
 };

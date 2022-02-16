@@ -4,12 +4,14 @@ export interface ChromaKeyData {
   color: string;
   similarity: number;
   blend: number;
-  startTime: number;
 }
 
-export interface WsChromaKeyOverlay extends ChromaKeyData {
+export interface WsOverlay {
   id: string;
   video: Video;
+  startTime: number;
+  duration: number;
+  chroma?: ChromaKeyData;
 }
 
-export type WsLayerItem = WsChromaKeyOverlay;
+export type WsLayerItem = WsOverlay;

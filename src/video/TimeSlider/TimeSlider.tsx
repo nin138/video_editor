@@ -2,13 +2,12 @@ import React, { useContext, useState } from 'react';
 import styles from './TimeSlider.module.css';
 import { Scales } from './Scales';
 import thumbStyle from '../../atoms/Range/Range.module.css';
-import { ScrollContainer } from '../../atoms/ScrollContainer';
+import { DraggableScrollContainer } from '../../atoms/DraggableScrollContainer';
 import { TimeStepSelector } from '../../atoms/Range/TimeStepSelector';
 import scaleStyle from './Scales.module.css';
 import { Slider } from '../../atoms/Range/Slider';
 import { Range } from '../../atoms/Range/Range';
 import { RangeData } from '../../rangeData';
-import { AppEventContext } from '../../context/AppEvent';
 
 interface Props {
   duration: number;
@@ -49,13 +48,7 @@ const steps: Record<Step, CalcWidth> = {
   [Step.Sec]: (duration, width) => duration * MARK_WIDTH,
 };
 
-export const TimeSlider: React.FC<Props> = ({
-  videoRef,
-  duration,
-  onVideoSeeked,
-  onRangeChanged,
-  range,
-}) => {
+export const TimeSlider: React.FC<Props> = ({ videoRef, duration, onVideoSeeked, onRangeChanged, range }) => {
   const [step, setStep] = useState(Step.All);
 
   const updateStep = (step: Step) => {
@@ -74,26 +67,19 @@ export const TimeSlider: React.FC<Props> = ({
   return (
     <div className={styles.wrap}>
       <TimeStepSelector step={step} onChange={updateStep} />
-      <ScrollContainer
+      <DraggableScrollContainer
         hideScrollbars={false}
         targetElementClass={scaleStyle.wrap}
         className={styles.scroll}
         ignoreElements={`${thumbStyle.sliderThumb},${thumbStyle.thumb}`}
       >
-        <div
-          className={styles.area}
-          style={{ width: width === 0 ? '100%' : width + 'px' }}
-        >
+        <div className={styles.area} style={{ width: width === 0 ? '100%' : width + 'px' }}>
           <Scales width={width} duration={duration} step={step} />
-          <Slider
-            value={videoRef.currentTime}
-            onChange={onVideoSeeked}
-            max={duration}
-          />
+          <Slider value={videoRef.currentTime} onChange={onVideoSeeked} max={duration} />
 
           <Range values={range.data} onChange={onRangeChanged} max={duration} />
         </div>
-      </ScrollContainer>
+      </DraggableScrollContainer>
     </div>
   );
 };

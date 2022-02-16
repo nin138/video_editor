@@ -1,8 +1,10 @@
 import { Video } from '../../entities/video';
+import { WsOverlay } from '../../context/workspace/WsLayerItem';
 
 export const DragItemType = {
   Video: 'Video',
   WorkspaceVideo: 'WorkspaceVideo',
+  WsOverlayVideo: 'WsOverlayVideo',
 } as const;
 
 export interface DraggingWsVideo {
@@ -18,6 +20,12 @@ export interface DraggingWsVideo {
 export interface DraggingVideo {
   type: typeof DragItemType.Video;
   video: Video;
+}
+
+export interface DraggingWsOverlayVideo {
+  type: typeof DragItemType.WsOverlayVideo;
+  item: WsOverlay;
+  pxPerSec: number;
 }
 
 export type WsVideoDroppable = DraggingWsVideo | DraggingVideo;

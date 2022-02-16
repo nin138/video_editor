@@ -1,29 +1,21 @@
-import React, { useRef, useState } from 'react';
+import React from 'react';
 import { WorkspaceActionDispatcher } from '../../context/workspace/WorkspaceAction';
-import { ChromaKeyData } from '../../context/workspace/WsLayerItem';
 import { Workspace } from '../../entities/workspace';
-import { WsChromaKeyLayer } from './WsChromaKeyLayer';
-
-const def: ChromaKeyData = {
-  color: '#fff',
-  similarity: 0.01,
-  blend: 0,
-  startTime: 0,
-};
+import { WsOverlayLayer } from './WsOverlayLayer';
 
 interface Props {
   workspace: Workspace;
   wsDispatcher: WorkspaceActionDispatcher;
-  // pxPerSec: number;
+  pxPerSec: number;
 }
 
-export const WsLayers: React.VFC<Props> = ({ workspace, wsDispatcher }) => {
+export const WsLayers: React.VFC<Props> = ({ workspace, wsDispatcher, pxPerSec }) => {
   const items = workspace.layers;
 
   return (
     <>
       {items.map((it) => (
-        <WsChromaKeyLayer item={it} />
+        <WsOverlayLayer key={it.id} item={it} pxPerSec={pxPerSec} wsId={workspace.id} wsDispatcher={wsDispatcher} />
       ))}
     </>
   );

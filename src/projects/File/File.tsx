@@ -17,12 +17,7 @@ interface Props {
   addToWorkspace?: (video: Video) => void;
 }
 
-export const File: React.FC<Props> = ({
-  video,
-  onClick,
-  selected,
-  addToWorkspace,
-}) => {
+export const File: React.FC<Props> = ({ video, onClick, selected, addToWorkspace }) => {
   const dlRef = useRef<HTMLAnchorElement>(null);
   const [dlWaiting, setDlWaiting] = useState(false);
 
@@ -35,11 +30,7 @@ export const File: React.FC<Props> = ({
     setDlWaiting(false); // todo when too fast
   };
 
-  const [, drag, preview] = useDrag<
-    DraggingVideo,
-    unknown,
-    { isDragging: boolean }
-  >(() => ({
+  const [, drag, preview] = useDrag<DraggingVideo, unknown, { isDragging: boolean }>(() => ({
     type: DragItemType.Video,
     item: (monitor) => ({
       type: DragItemType.Video,
@@ -58,32 +49,20 @@ export const File: React.FC<Props> = ({
   const dl = dlWaiting ? (
     <CircularProgress size={24} />
   ) : (
-    <IconButton
-      onClick={download}
-      className={styles.dlIconButton}
-      popOver={'ダウンロード'}
-    >
+    <IconButton onClick={download} className={styles.dlIconButton} popOver={'ダウンロード'}>
       <DownloadIcon className={styles.dlIcon} />
     </IconButton>
   );
 
   const addToWs = addToWorkspace ? (
-    <IconButton
-      className={styles.dlIconButton}
-      onClick={() => addToWorkspace(video)}
-      popOver={'workspaceに追加する'}
-    >
+    <IconButton className={styles.dlIconButton} onClick={() => addToWorkspace(video)} popOver={'workspaceに追加する'}>
       <AddToWorkspaceIcon className={styles.dlIcon} />
     </IconButton>
   ) : null;
 
   return (
     <div ref={drag}>
-      <FileView
-        onClick={onClick}
-        selected={selected}
-        fileName={video.fileName()}
-      >
+      <FileView onClick={onClick} selected={selected} fileName={video.fileName()}>
         {addToWs}
         {dl}
       </FileView>

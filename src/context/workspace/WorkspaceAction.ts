@@ -1,7 +1,7 @@
 import { Workspace } from '../../entities/workspace';
 import { Video } from '../../entities/video';
 import { getResource } from '../../util';
-import { WsChromaKeyOverlay } from './WsLayerItem';
+import { WsOverlay } from './WsLayerItem';
 import { nanoid } from 'nanoid';
 
 export const WsActionTypes = {
@@ -9,7 +9,9 @@ export const WsActionTypes = {
   UpdateWorkspace: 'UpdateWorkspace',
   AddVideoToWorkspace: 'AddVideoToWorkspace',
   RemoveVideoFromWs: 'RemoveVideoFromWs',
-  AddChromaKeyOverlay: 'AddChromaKeyOverlay',
+  AddOverlayVideo: 'AddOverlayVideo',
+  UpdateOverlay: 'UpdateOverlay',
+  RemoveLayer: 'RemoveLayer',
 } as const;
 
 interface AddWorkSpaceAction {
@@ -36,10 +38,22 @@ interface RemoveVideoFromWs {
   itemId: string;
 }
 
-interface AddChromaKeyOverlay {
-  type: typeof WsActionTypes.AddChromaKeyOverlay;
+interface AddOverlayVideo {
+  type: typeof WsActionTypes.AddOverlayVideo;
   wsId: string;
-  item: WsChromaKeyOverlay;
+  item: WsOverlay;
+}
+
+interface UpdateOverlayVideo {
+  type: typeof WsActionTypes.UpdateOverlay;
+  wsId: string;
+  item: Partial<WsOverlay> & Pick<WsOverlay, 'id'>;
+}
+
+interface RemoveLayer {
+  type: typeof WsActionTypes.RemoveLayer;
+  wsId: string;
+  itemId: string;
 }
 
 export type WorkspaceAction =
@@ -47,7 +61,9 @@ export type WorkspaceAction =
   | UpdateWorkSpace
   | AddVideoToWorkspace
   | RemoveVideoFromWs
-  | AddChromaKeyOverlay;
+  | AddOverlayVideo
+  | UpdateOverlayVideo
+  | RemoveLayer;
 
 export class WorkspaceActionDispatcher {
   constructor(private _dispatch: (action: WorkspaceAction) => void) {}
@@ -89,11 +105,27 @@ export class WorkspaceActionDispatcher {
     });
   };
 
-  addChromaKeyOverlay = (wsId: string, item: Omit<WsChromaKeyOverlay, 'id'>) => {
+  addOverlayVideo = async (wsId: string, item: Omit<WsOverlay, 'id' | 'duration'>) => {
     this.dispatch({
-      type: WsActionTypes.AddChromaKeyOverlay,
+      type: WsActionTypes.AddOverlayVideo,
       wsId,
-      item: { ...item, id: nanoid() },
+      item: { ...item, id: nanoid(), duration: await getResource(item.video.getDuration()) },
+    });
+  };
+
+  updateOverlayVideo = (wsId: string, item: Partial<WsOverlay> & Pick<WsOverlay, 'id'>) => {
+    this.dispatch({
+      type: WsActionTypes.UpdateOverlay,
+      wsId,
+      item,
+    });
+  };
+
+  removeLayer = (wsId: string, itemId: string) => {
+    this.dispatch({
+      type: WsActionTypes.RemoveLayer,
+      wsId,
+      itemId,
     });
   };
 }

@@ -9,11 +9,7 @@ interface Props {
   selected: boolean;
 }
 
-export const WorkspaceName: React.FC<Props> = ({
-  workspace,
-  onClick,
-  selected,
-}) => {
+export const WorkspaceName: React.FC<Props> = ({ workspace, onClick, selected }) => {
   return (
     <div className={classNames(styles.file, selected ? styles.selected : '')}>
       <div onClick={onClick} className={styles.fileName}>

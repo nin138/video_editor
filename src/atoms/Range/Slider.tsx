@@ -19,9 +19,7 @@ export const Slider: React.FC<Props> = ({ value, onChange, max }) => {
         min={0}
         step={0.01}
         max={max}
-        renderTrack={(props) => (
-          <SliderTrack max={max} value={value} {...props} />
-        )}
+        renderTrack={(props) => <SliderTrack max={max} value={value} {...props} />}
         renderThumb={SliderThumb}
       />
     </div>

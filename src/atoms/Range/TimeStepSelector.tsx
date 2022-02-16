@@ -23,9 +23,7 @@ export const TimeStepSelector: React.FC<Props> = ({ step, onChange }) => {
         min={0}
         max={MAX}
         step={1}
-        renderTrack={(props) => (
-          <TimeStepSelectorTrack max={MAX} value={step} {...props} />
-        )}
+        renderTrack={(props) => <TimeStepSelectorTrack max={MAX} value={step} {...props} />}
         renderThumb={SliderThumb}
         renderMark={TimeStepSelectorMark}
       />

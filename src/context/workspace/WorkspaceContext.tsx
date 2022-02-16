@@ -1,9 +1,5 @@
 import React, { useMemo, useReducer, useState } from 'react';
-import {
-  getDefaultWorkspace,
-  SelectedItemType,
-  Workspace,
-} from '../../entities/workspace';
+import { getDefaultWorkspace, SelectedItemType, Workspace } from '../../entities/workspace';
 import { Video } from '../../entities/video';
 import { WorkspaceActionDispatcher } from './WorkspaceAction';
 import { workspaceReducer, WorkspaceState } from './WorkspaceReducer';
@@ -43,13 +39,8 @@ export const WorkspaceContext = React.createContext<Context>({
 
 export const WorkspaceProvider: React.FC = ({ children }) => {
   const [{ workspaces }, dispatch] = useReducer(workspaceReducer, initialState);
-  const dispatcher = useMemo(
-    () => new WorkspaceActionDispatcher(dispatch),
-    [dispatch]
-  );
-  const [selectedItem, setSelectedItem] = useState<Video | string>(
-    initialState.workspaces[0].id
-  );
+  const dispatcher = useMemo(() => new WorkspaceActionDispatcher(dispatch), [dispatch]);
+  const [selectedItem, setSelectedItem] = useState<Video | string>(initialState.workspaces[0].id);
 
   const isWs = typeof selectedItem === 'string';
 
@@ -58,19 +49,10 @@ export const WorkspaceProvider: React.FC = ({ children }) => {
     dispatcher,
     selectedItem: {
       type: isWs ? SelectedItemType.Workspace : SelectedItemType.Video,
-      item: isWs
-        ? workspaces.find((it) => it.id === selectedItem)!
-        : selectedItem,
+      item: isWs ? workspaces.find((it) => it.id === selectedItem)! : selectedItem,
     } as SelectedItem,
-    setSelectedItem: (item) =>
-      setSelectedItem(
-        item.type === SelectedItemType.Workspace ? item.id : item
-      ),
+    setSelectedItem: (item) => setSelectedItem(item.type === SelectedItemType.Workspace ? item.id : item),
   };
 
-  return (
-    <WorkspaceContext.Provider value={context}>
-      {children}
-    </WorkspaceContext.Provider>
-  );
+  return <WorkspaceContext.Provider value={context}>{children}</WorkspaceContext.Provider>;
 };

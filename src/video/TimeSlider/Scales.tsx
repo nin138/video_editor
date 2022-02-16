@@ -28,11 +28,7 @@ export const Scales: React.FC<Props> = ({ width, step }) => {
   const items = [];
   for (let i = 0; i <= count; i++) {
     items.push(
-      <div
-        key={i}
-        style={{ left: (i - 1) * MARK_WIDTH }}
-        className={styles.line}
-      >
+      <div key={i} style={{ left: (i - 1) * MARK_WIDTH }} className={styles.line}>
         <div className={styles.time}>{iToDisplayString(i - 1, step)}</div>
       </div>
     );

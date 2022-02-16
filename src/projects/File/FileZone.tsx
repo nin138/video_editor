@@ -8,6 +8,7 @@ import { ClipContext } from '../../context/ClipsContext';
 import { Workspaces } from './Workspaces';
 import { WorkspaceContext } from '../../context/workspace/WorkspaceContext';
 import { SelectedItemType } from '../../entities/workspace';
+import { ScrollContainer } from '../../atoms/ScrollContainer';
 
 const NoItem: React.FC = () => {
   return (
@@ -19,16 +20,11 @@ const NoItem: React.FC = () => {
 
 export const FileZone: React.FC = () => {
   const [files, setFiles] = useState<LocalVideo[]>([]);
-  const { selectedItem, setSelectedItem, dispatcher } =
-    useContext(WorkspaceContext);
-  const selectedVideoId =
-    selectedItem.type === SelectedItemType.Video ? selectedItem.item.id : '';
+  const { selectedItem, setSelectedItem, dispatcher } = useContext(WorkspaceContext);
+  const selectedVideoId = selectedItem.type === SelectedItemType.Video ? selectedItem.item.id : '';
 
   const onFileDrop = (newFiles: File[]) => {
-    setFiles((current) => [
-      ...current,
-      ...newFiles.map((it) => new LocalVideo(it)),
-    ]);
+    setFiles((current) => [...current, ...newFiles.map((it) => new LocalVideo(it))]);
   };
 
   const onFileClick = async (video: Video) => {
@@ -59,21 +55,14 @@ export const FileZone: React.FC = () => {
   return (
     <div className={styles.fileZone}>
       <Dropzone onDrop={onFileDrop}>
-        <div className={classNames(styles.scroll, styles.files)}>
-          {fileElements}
-        </div>
+        <ScrollContainer className={classNames(styles.scroll, styles.files)}>{fileElements}</ScrollContainer>
       </Dropzone>
       <div className={styles.head}>clips</div>
-      <div className={classNames(styles.scroll, styles.clips)}>
+      <ScrollContainer className={classNames(styles.scroll, styles.clips)}>
         {clips.map((it, i) => (
-          <File
-            selected={selectedVideoId === it.id}
-            key={i}
-            video={it}
-            onClick={() => onFileClick(it)}
-          />
+          <File selected={selectedVideoId === it.id} key={i} video={it} onClick={() => onFileClick(it)} />
         ))}
-      </div>
+      </ScrollContainer>
       <Workspaces />
     </div>
   );
