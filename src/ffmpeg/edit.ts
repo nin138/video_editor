@@ -24,8 +24,13 @@ const concatVideos = async (videoItems: WsVideoItem[]): Promise<Video> => {
 const overlay = async (base: Video, item: WsOverlay) => {
   const ffmpeg = await getFFmpeg();
   const path = item.chroma
-    ? await ffmpeg.chromaKey(base, item.video, item.chroma, item.startTime)
-    : await ffmpeg.overlay(base, item.video, item.startTime);
+    ? await ffmpeg.chromaKey(
+        await getResource(base.getPath()),
+        await getResource(item.video.getPath()),
+        item.chroma,
+        item.startTime
+      )
+    : await ffmpeg.overlay(await getResource(base.getPath()), await getResource(item.video.getPath()), item.startTime);
   return new ClipVideo(path);
 };
 

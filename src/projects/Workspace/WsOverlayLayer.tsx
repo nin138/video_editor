@@ -1,11 +1,12 @@
-import React from 'react';
+import React, { useRef } from 'react';
 import { useDrop } from 'react-dnd';
-import { DragItemType, WsVideoDroppable } from './workspaceDraggable';
+import { DraggingWsOverlayVideo, DragItemType } from './workspaceDraggable';
 import styles from './Workspace.module.css';
-import { classNames } from '../../util';
+import { classNames, useCombinedRefs } from '../../util';
 import { WsOverlay } from '../../context/workspace/WsLayerItem';
 import { WsOverlayVideo } from './Draggable/WsOverlayVideo';
 import { WorkspaceActionDispatcher } from '../../context/workspace/WorkspaceAction';
+import { useElementRect } from '../../hooks/useElementRect';
 
 interface Props {
   wsId: string;
@@ -15,19 +16,34 @@ interface Props {
 }
 
 export const WsOverlayLayer: React.VFC<Props> = ({ item, pxPerSec, wsId, wsDispatcher }) => {
-  const [{ canDrop }, drop] = useDrop<WsVideoDroppable & { initialX: number }, unknown, { canDrop: boolean }>(() => ({
-    accept: [DragItemType.Video], // TODO
-    drop: (item, monitor) => {},
-    canDrop: (item) => {
-      return true; // TODO
-    },
-    collect: (monitor) => ({
-      canDrop: monitor.canDrop(),
+  const areaRef = useRef<HTMLDivElement>();
+  const rect = useElementRect(areaRef);
+
+  const [{ canDrop }, drop] = useDrop<DraggingWsOverlayVideo & { initialX: number }, unknown, { canDrop: boolean }>(
+    () => ({
+      accept: [DragItemType.WsOverlayVideo],
+      drop: (item, monitor) => {
+        const x = monitor.getClientOffset()?.x;
+        const x2 = monitor.getInitialClientOffset()?.x;
+        if (!x || !x2) return;
+        console.log(x - x2!);
+        console.log(x, x2);
+        wsDispatcher.updateOverlayVideo(wsId, { id: item.id, startTime: item.startTime + (x - x2) / pxPerSec });
+      },
+      canDrop: (dragging) => {
+        return item.id === dragging.id;
+      },
+      collect: (monitor) => ({
+        canDrop: monitor.canDrop(),
+      }),
     }),
-  }));
+    [pxPerSec, item]
+  );
+
+  const ref = useCombinedRefs<any>(drop, areaRef);
 
   return (
-    <div className={classNames(styles.line, canDrop ? styles.videoCanDrop : '')} ref={drop}>
+    <div className={classNames(styles.line, canDrop ? styles.videoCanDrop : '')} ref={ref}>
       <WsOverlayVideo item={item} pxPerSec={pxPerSec} wsId={wsId} wsDispatcher={wsDispatcher} />
     </div>
   );

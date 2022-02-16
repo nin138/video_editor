@@ -39,3 +39,32 @@ const hexcolor = /^#?([0-9A-F]{3}|[0-9A-F]{6})$/i;
 export const isHexColor = (color: string): boolean => {
   return hexcolor.test(color);
 };
+
+type Resource<T> = { read: () => T | Promise<T> };
+export const toResource = <T>(promise: Promise<T>): Resource<T> => {
+  let status = 'pending';
+  let result: any;
+
+  const suspender = promise.then(
+    (r) => {
+      status = 'fulfilled';
+      result = r;
+    },
+    (e) => {
+      status = 'rejected';
+      result = e;
+    }
+  );
+
+  const read = () => {
+    if (status === 'pending') {
+      throw suspender;
+    } else if (status === 'rejected') {
+      throw result;
+    } else {
+      return result;
+    }
+  };
+
+  return { read };
+};

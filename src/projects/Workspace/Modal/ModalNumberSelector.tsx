@@ -2,12 +2,6 @@ import React from 'react';
 import styles from './Modal.module.css';
 import { Typography } from '@mui/material';
 import Slider from '@mui/material/Slider';
-import { ChromaKeyData } from '../../../context/workspace/WsLayerItem';
-const def: ChromaKeyData = {
-  color: '#fff',
-  similarity: 0.01,
-  blend: 0,
-};
 
 interface Props {
   value: number;

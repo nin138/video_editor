@@ -22,10 +22,11 @@ export interface DraggingVideo {
   video: Video;
 }
 
-export interface DraggingWsOverlayVideo {
+export interface DraggingWsOverlayVideo extends WsOverlay {
   type: typeof DragItemType.WsOverlayVideo;
-  item: WsOverlay;
   pxPerSec: number;
 }
 
 export type WsVideoDroppable = DraggingWsVideo | DraggingVideo;
+
+export type Draggable = WsVideoDroppable | DraggingWsOverlayVideo;

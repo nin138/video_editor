@@ -1,7 +1,7 @@
 import React, { useEffect, useRef, useState } from 'react';
 import styles from './WsItem.module.css';
 import { useDrag, useDrop, XYCoord } from 'react-dnd';
-import { DraggingWsOverlayVideo, DraggingWsVideo, DragItemType } from '../workspaceDraggable';
+import { DraggingWsOverlayVideo, DragItemType } from '../workspaceDraggable';
 import { useCombinedRefs } from '../../../util';
 import { getEmptyImage } from 'react-dnd-html5-backend';
 import { WsVideoView } from './WsVideoView';
@@ -23,7 +23,7 @@ interface Props {
 export const WsOverlayVideo: React.VFC<Props> = ({ wsId, item, pxPerSec, wsDispatcher }) => {
   const dragItem: DraggingWsOverlayVideo = {
     type: DragItemType.WsOverlayVideo,
-    item,
+    ...item,
     pxPerSec,
   };
   const [modal, setModal] = useState(false);

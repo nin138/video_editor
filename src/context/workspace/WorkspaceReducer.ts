@@ -11,19 +11,22 @@ export interface WorkspaceState {
 const calcDuration = (ws: Workspace): Workspace => {
   return {
     ...ws,
-    videoItems: ws.videoItems.sort((a, b) => a.startTime - b.startTime),
+    videoItems: ws.videoItems
+      .sort((a, b) => a.startTime - b.startTime)
+      .map((it) => (it.startTime < 0 ? { ...it, startTime: 0 } : it)),
+    layers: ws.layers.map((it) => (it.startTime < 0 ? { ...it, startTime: 0 } : it)),
     duration: ws.videoItems.reduce((previousValue, currentValue) => previousValue + currentValue.duration, 0),
   };
 };
 
-export const workspaceReducer: Reducer<WorkspaceState, WorkspaceAction> = (prevState, action) => {
-  const updateWs = (wsId: string, cb: (ws: Workspace) => Workspace) => {
-    return {
-      ...prevState,
-      workspaces: prevState.workspaces.map((it) => (it.id === wsId ? calcDuration(cb(it)) : it)),
-    };
+const updateWs = (prevState: WorkspaceState, wsId: string, cb: (ws: Workspace) => Workspace) => {
+  return {
+    ...prevState,
+    workspaces: prevState.workspaces.map((it) => (it.id === wsId ? calcDuration(cb(it)) : it)),
   };
+};
 
+export const workspaceReducer: Reducer<WorkspaceState, WorkspaceAction> = (prevState, action) => {
   switch (action.type) {
     case WsActionTypes.AddWorkSpace:
       return {
@@ -31,7 +34,7 @@ export const workspaceReducer: Reducer<WorkspaceState, WorkspaceAction> = (prevS
         workspaces: [...prevState.workspaces, getDefaultWorkspace(prevState.workspaces.length)],
       };
     case WsActionTypes.UpdateWorkspace: {
-      return updateWs(action.wsId, action.updater);
+      return updateWs(prevState, action.wsId, action.updater);
     }
     case WsActionTypes.AddVideoToWorkspace: {
       const item: WsVideoItem = {
@@ -44,31 +47,31 @@ export const workspaceReducer: Reducer<WorkspaceState, WorkspaceAction> = (prevS
           .videoItems.reduce((previousValue, currentValue) => previousValue + currentValue.duration, 0),
         url: action.url,
       };
-      return updateWs(action.wsId, (ws) => ({
+      return updateWs(prevState, action.wsId, (ws) => ({
         ...ws,
         videoItems: [...ws.videoItems, item],
       }));
     }
     case WsActionTypes.RemoveVideoFromWs: {
-      return updateWs(action.wsId, (ws) => ({
+      return updateWs(prevState, action.wsId, (ws) => ({
         ...ws,
         videoItems: ws.videoItems.filter((it) => it.itemId !== action.itemId),
       }));
     }
     case WsActionTypes.AddOverlayVideo: {
-      return updateWs(action.wsId, (ws) => ({
+      return updateWs(prevState, action.wsId, (ws) => ({
         ...ws,
         layers: [...ws.layers, action.item],
       }));
     }
     case WsActionTypes.UpdateOverlay: {
-      return updateWs(action.wsId, (ws) => ({
+      return updateWs(prevState, action.wsId, (ws) => ({
         ...ws,
         layers: ws.layers.map((it) => (it.id === action.item.id ? { ...it, ...action.item } : it)),
       }));
     }
     case WsActionTypes.RemoveLayer: {
-      return updateWs(action.wsId, (ws) => ({
+      return updateWs(prevState, action.wsId, (ws) => ({
         ...ws,
         layers: ws.layers.filter((it) => action.itemId !== it.id),
       }));

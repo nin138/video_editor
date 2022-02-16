@@ -1,6 +1,6 @@
 import React, { CSSProperties } from 'react';
 import { XYCoord, useDragLayer } from 'react-dnd';
-import { DragItemType, WsVideoDroppable } from '../workspaceDraggable';
+import { Draggable, DragItemType } from '../workspaceDraggable';
 import { WsVideoView } from './WsVideoView';
 import styles from './WsItem.module.css';
 
@@ -33,7 +33,7 @@ function getItemStyles(initialOffset: XYCoord | null, currentOffset: XYCoord | n
 export interface CustomDragLayerProps {}
 
 interface CollectedProps {
-  item: WsVideoDroppable;
+  item: Draggable;
   initialOffset: XYCoord | null;
   currentOffset: XYCoord | null;
   isDragging: boolean;
@@ -64,6 +64,15 @@ export const CustomDragLayer: React.VFC<CustomDragLayerProps> = (props) => {
         );
       case DragItemType.Video:
         return <WsVideoView name={item.video.fileName()} color={'#777'} width={200} />;
+      case DragItemType.WsOverlayVideo:
+        return (
+          <WsVideoView
+            name={item.video.fileName()}
+            color={'#333'}
+            width={item.duration * item.pxPerSec}
+            className={styles.alpha}
+          />
+        );
     }
     return 'not impl';
   };

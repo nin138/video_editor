@@ -7,7 +7,7 @@ import { ChromaKeyData } from '../context/workspace/WsLayerItem';
 export const FILE_DIR = '/files/';
 export const CLIP_DIR = '/clips/';
 
-class FFmpeg {
+export class FFmpeg {
   private defaultLogger: LogCallback = ({ type, message }) => {
     console.log(`type: ${type}|m=${message}`);
   };
@@ -79,14 +79,14 @@ class FFmpeg {
     return result;
   }
 
-  private async composition(base: Video, overlay: Video, filters: string[]) {
+  private async composition(base: string, overlay: string, filters: string[]) {
     const outFileName = 'composition_' + nanoid() + '.mp4';
 
     const args = [
       '-i',
-      await getResource(base.getPath()),
+      await getResource(base),
       '-i',
-      await getResource(overlay.getPath()),
+      await getResource(overlay),
       '-filter_complex',
       `${filters.join(';')}`,
       '-map',
@@ -104,7 +104,7 @@ class FFmpeg {
     return outFileName;
   }
 
-  async overlay(base: Video, overlay: Video, startTime: number = 0) {
+  async overlay(base: string, overlay: string, startTime: number = 0) {
     const filters = [
       `[1:v]setpts=PTS-STARTPTS+${startTime}/TB[ovr]`,
       `[0:v][ovr]overlay=enable=gte(t\\,${startTime}):eof_action=pass[out]`,
@@ -112,9 +112,9 @@ class FFmpeg {
     return this.composition(base, overlay, filters);
   }
 
-  async chromaKey(base: Video, overlay: Video, chroma: ChromaKeyData, startTime: number = 0) {
+  async chromaKey(base: string, overlay: string, chroma: ChromaKeyData, startTime: number = 0) {
     const filters = [
-      `[1:v]colorkey=0x${chroma.color}:${chroma.similarity}:${chroma.blend}[ckout]`,
+      `[1:v]colorkey=${chroma.color.replace('#', '0x')}:${chroma.similarity}:${chroma.blend}[ckout]`,
       `[ckout]setpts=PTS-STARTPTS+${startTime}/TB[ovr]`,
       `[0:v][ovr]overlay=enable=gte(t\\,${startTime}):eof_action=pass[out]`,
     ];
