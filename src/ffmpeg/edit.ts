@@ -1,5 +1,4 @@
 import { Workspace, WsVideoItem } from '../entities/workspace';
-import { getResource } from '../util';
 import { getFFmpeg } from './ffmpeg';
 import { getOutputFileName } from './getFileName';
 import { ClipVideo, Video } from '../entities/video';
@@ -9,9 +8,7 @@ const concatVideos = async (videoItems: WsVideoItem[]): Promise<Video> => {
   const list = Array.from(videoItems);
   if (list.length === 1) return list[0].video;
 
-  const paths = await Promise.all(
-    list.sort((a, b) => a.startTime - b.startTime).map((it) => getResource(it.video.getPath()))
-  );
+  const paths = await Promise.all(list.sort((a, b) => a.startTime - b.startTime).map((it) => it.video.getPath()));
 
   const ffmpeg = await getFFmpeg();
 
@@ -24,13 +21,8 @@ const concatVideos = async (videoItems: WsVideoItem[]): Promise<Video> => {
 const overlay = async (base: Video, item: WsOverlay) => {
   const ffmpeg = await getFFmpeg();
   const path = item.chroma
-    ? await ffmpeg.chromaKey(
-        await getResource(base.getPath()),
-        await getResource(item.video.getPath()),
-        item.chroma,
-        item.startTime
-      )
-    : await ffmpeg.overlay(await getResource(base.getPath()), await getResource(item.video.getPath()), item.startTime);
+    ? await ffmpeg.chromaKey(await base.getPath(), await item.video.getPath(), item.chroma, item.startTime)
+    : await ffmpeg.overlay(await base.getPath(), await item.video.getPath(), item.startTime);
   return new ClipVideo(path);
 };
 

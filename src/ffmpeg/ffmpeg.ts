@@ -1,8 +1,6 @@
 import { createFFmpeg, LogCallback } from '@ffmpeg/ffmpeg';
 import { nanoid } from 'nanoid';
 import { FS } from './fs';
-import { Video } from '../entities/video';
-import { getResource } from '../util';
 import { ChromaKeyData } from '../context/workspace/WsLayerItem';
 export const FILE_DIR = '/files/';
 export const CLIP_DIR = '/clips/';
@@ -84,9 +82,9 @@ export class FFmpeg {
 
     const args = [
       '-i',
-      await getResource(base),
+      base,
       '-i',
-      await getResource(overlay),
+      overlay,
       '-filter_complex',
       `${filters.join(';')}`,
       '-map',

@@ -40,17 +40,19 @@ export const isHexColor = (color: string): boolean => {
   return hexcolor.test(color);
 };
 
-type Resource<T> = { read: () => T | Promise<T> };
+export type Resource<T> = { read: () => T };
 export const toResource = <T>(promise: Promise<T>): Resource<T> => {
   let status = 'pending';
   let result: any;
 
   const suspender = promise.then(
     (r) => {
+      console.log('then');
       status = 'fulfilled';
       result = r;
     },
     (e) => {
+      console.log('c');
       status = 'rejected';
       result = e;
     }

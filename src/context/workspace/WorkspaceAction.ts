@@ -1,6 +1,5 @@
 import { Workspace } from '../../entities/workspace';
 import { Video } from '../../entities/video';
-import { getResource } from '../../util';
 import { WsOverlay } from './WsLayerItem';
 import { nanoid } from 'nanoid';
 
@@ -92,8 +91,8 @@ export class WorkspaceActionDispatcher {
       type: WsActionTypes.AddVideoToWorkspace,
       wsId,
       video,
-      duration: await getResource(video.getDuration()),
-      url: await getResource(video.getUrl()),
+      duration: await video.getDuration(),
+      url: await video.getUrl(),
     });
   };
 
@@ -109,7 +108,7 @@ export class WorkspaceActionDispatcher {
     this.dispatch({
       type: WsActionTypes.AddOverlayVideo,
       wsId,
-      item: { ...item, id: nanoid(), duration: await getResource(item.video.getDuration()) },
+      item: { ...item, id: nanoid(), duration: await item.video.getDuration() },
     });
   };
 

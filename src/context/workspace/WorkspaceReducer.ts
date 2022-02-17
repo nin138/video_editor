@@ -1,7 +1,7 @@
 import { Reducer } from 'react';
 import { getDefaultWorkspace, Workspace, WsVideoItem } from '../../entities/workspace';
 import { WorkspaceAction, WsActionTypes } from './WorkspaceAction';
-import { getColor } from '../../projects/Workspace/Draggable/getColor';
+import { getColor } from '../../Components/Projects/Workspace/Draggable/getColor';
 import { nanoid } from 'nanoid';
 
 export interface WorkspaceState {

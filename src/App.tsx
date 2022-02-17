@@ -1,14 +1,13 @@
 import React from 'react';
-import './App.css';
 import { AppEventProvider } from './context/AppEvent';
-import { FileZone } from './projects/File/FileZone';
 import { ClipContextProvider } from './context/ClipsContext';
-import { Main } from './projects/Main';
+import { Main } from './Components/Main';
 import { DndProvider } from 'react-dnd';
 import { HTML5Backend } from 'react-dnd-html5-backend';
 import { WorkspaceProvider } from './context/workspace/WorkspaceContext';
 import ThemeProvider from '@mui/material/styles/ThemeProvider';
 import { theme } from './theme';
+import { FileZone } from './Components/Projects/File/FileZone';
 
 function App() {
   return (
