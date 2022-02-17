@@ -3,6 +3,8 @@ import { Workspace } from '../../../../entities/workspace';
 import { loop } from '../../../../loop';
 import { WsVideoControl } from './WsVideoControl';
 import styles from './WsPlayer.module.css';
+import { useElementRect } from '../../../../hooks/useElementRect';
+import { Canvas } from './Canvas';
 
 const getTargetIndex = (workspace: Workspace, currentTime: number) => {
   return (
@@ -28,6 +30,8 @@ export const WsPlayer: React.VFC<Props> = ({ workspace, onTimeUpdate }) => {
     onTimeUpdate(currentTime);
   }, [currentTime, onTimeUpdate]);
 
+  const areaRef = useRef<HTMLDivElement>(null);
+  const areaRect = useElementRect(areaRef);
   const videoRefs = useRef<React.RefObject<HTMLVideoElement>[]>([]);
   videoRefs.current = workspace.videoItems.map((_, i) => videoRefs.current[i] ?? createRef());
 
@@ -87,7 +91,8 @@ export const WsPlayer: React.VFC<Props> = ({ workspace, onTimeUpdate }) => {
         className={styles.video}
         style={{
           opacity: isCurrent ? 1 : 0,
-          width: 480,
+          width: areaRect?.width || 480,
+          height: areaRect?.height || 320,
           zIndex: isCurrent ? 1 : 0,
         }}
         onEnded={onEnded}
@@ -109,7 +114,10 @@ export const WsPlayer: React.VFC<Props> = ({ workspace, onTimeUpdate }) => {
 
   return (
     <div>
-      <div className={styles.videoArea}>{videoElements}</div>
+      <div ref={areaRef} className={styles.videoArea}>
+        {videoElements}
+        <Canvas width={areaRect?.width || 480} height={areaRect?.height || 320} />
+      </div>
       <WsVideoControl
         workspace={workspace}
         playing={playing}

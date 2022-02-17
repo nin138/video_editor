@@ -10,7 +10,6 @@ import { Slider } from '@mui/material';
 import { WorkspaceActionDispatcher } from '../../../context/workspace/WorkspaceAction';
 import { WsPlayer } from './Player/WsPlayer';
 import { VideoLine } from './VideoLine';
-import { calcTransform } from './translate';
 import { NextLine } from './NextLine';
 import { WsLayers } from './WsLayers';
 import { encodeVideo } from '../../../ffmpeg/edit';
@@ -23,7 +22,7 @@ interface Props {
   wsDispatcher: WorkspaceActionDispatcher;
 }
 
-const SCROLL_LEFT_WIDTH = 250;
+const SCROLL_LEFT_WIDTH = 224;
 
 export const WorkSpace: React.VFC<Props> = ({ workspace, wsDispatcher }) => {
   const videoItems = workspace.videoItems;
@@ -47,7 +46,7 @@ export const WorkSpace: React.VFC<Props> = ({ workspace, wsDispatcher }) => {
 
   const onTimeUpdate = (time: number) => {
     if (!timeIndicator.current) return;
-    timeIndicator.current.style.transform = calcTransform(time, pxPerSec);
+    timeIndicator.current.style.transform = `translate(${time * pxPerSec + SCROLL_LEFT_WIDTH}px)`;
   };
 
   return (
@@ -55,17 +54,19 @@ export const WorkSpace: React.VFC<Props> = ({ workspace, wsDispatcher }) => {
       <WsPlayer workspace={workspace} onTimeUpdate={onTimeUpdate} />
       <Slider onChange={(_, value) => setPxPerSec(value as number)} value={pxPerSec} min={1} max={100} />
       <ScrollContainer className={classNames(styles.scroll, '.scroll')} areaRef={areaRef}>
+        <div className={styles.timeIndicator} ref={timeIndicator}>
+          <div className={styles.triangle} />
+        </div>
         <div className={styles.scrollLeft}>
           <div>scale</div>
           <div>video</div>
         </div>
         <div className={styles.scrollInner}>
           <Scale duration={workspace.duration} pxPerSec={pxPerSec} />
-          <VideoLine workspace={workspace} wsDispatcher={wsDispatcher} pxPerSec={pxPerSec} />
-          <WsLayers workspace={workspace} wsDispatcher={wsDispatcher} pxPerSec={pxPerSec} />
-          <NextLine wsId={workspace.id} wsDispatcher={wsDispatcher} />
-          <div className={styles.timeIndicator} ref={timeIndicator}>
-            <div className={styles.triangle} />
+          <div className={styles.lineContainer}>
+            <VideoLine workspace={workspace} wsDispatcher={wsDispatcher} pxPerSec={pxPerSec} />
+            <WsLayers workspace={workspace} wsDispatcher={wsDispatcher} pxPerSec={pxPerSec} />
+            <NextLine wsId={workspace.id} wsDispatcher={wsDispatcher} />
           </div>
           <CustomDragLayer />
         </div>

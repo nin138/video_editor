@@ -8,6 +8,8 @@ import { WorkspaceProvider } from './context/workspace/WorkspaceContext';
 import ThemeProvider from '@mui/material/styles/ThemeProvider';
 import { theme } from './theme';
 import { FileZone } from './Components/Projects/File/FileZone';
+import { Canvas } from './Components/Projects/Workspace/Player/Canvas';
+import { CanvasVideo } from './Components/Projects/Canvas/CanvasVideo';
 
 function App() {
   return (
@@ -17,8 +19,9 @@ function App() {
           <ClipContextProvider>
             <WorkspaceProvider>
               <DndProvider backend={HTML5Backend}>
-                <FileZone />
-                <Main />
+                {/*<FileZone />*/}
+                {/*<Main />*/}
+                <CanvasVideo duration={15} />
               </DndProvider>
             </WorkspaceProvider>
           </ClipContextProvider>

@@ -1,6 +1,6 @@
 .videoArea {
   position: relative;
-  height: 500px;
+  height: 50vh;
 }
 
 .video {
@@ -19,4 +19,8 @@
 
 .timeSeparator {
   margin: 8px;
+}
+
+.canvas {
+  position: absolute;
 }

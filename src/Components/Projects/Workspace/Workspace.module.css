@@ -26,7 +26,7 @@
   background: rgba(255, 255, 255, 0.1);
   display: flex;
   overflow-x: scroll;
-  height: 200px;
+  height: 30vh;
 }
 
 .scrollLeft {
@@ -41,17 +41,21 @@
 .scrollInner {
   width: fit-content;
   min-width: calc(100% - 300px);
-  margin-left: 20px;
   position: relative;
 }
 
+.lineContainer {
+  margin-left: 20px;
+}
+
 .timeIndicator {
-  position: absolute;
+  position: sticky;
   background: #007bff;
   top: 20px;
-  bottom: 0;
   width: 2px;
   margin-left: 2px;
+  margin-top: 20px;
+  z-index: 2;
 }
 
 .triangle {
